@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jboss-deployment-structure>
+  <deployment>
+     <exclusions>
+        <module name="org.apache.logging.log4j.api"/>
+    </exclusions>
+    <dependencies>
+        <module name="org.hibernate.search.orm" services="export" />
+    </dependencies>
+  </deployment>
+</jboss-deployment-structure>
