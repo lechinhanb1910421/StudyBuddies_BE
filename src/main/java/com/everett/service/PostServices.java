@@ -16,5 +16,5 @@ public interface PostServices {
 
     public void updatePost(Long id, Post post);
 
-    public List<Post> seachRequestsByKeywords(String keywords);
+    public List<Post> seachPostsByKeywords(String keywords);
 }

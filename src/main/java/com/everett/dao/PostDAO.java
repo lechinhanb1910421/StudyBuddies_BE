@@ -42,7 +42,7 @@ public class PostDAO {
     }
 
     @SuppressWarnings("unchecked")
-    public List<Post> seachRequestsByKeywords(String keywords) {
+    public List<Post> seachPostsByKeywords(String keywords) {
         List<Post> list = null;
         FullTextEntityManager fullTextEntityManager = Search.getFullTextEntityManager(entityManager);
 

@@ -64,8 +64,8 @@ public class PostServiceImp implements PostServices {
     }
 
     @Override
-    public List<Post> seachRequestsByKeywords(String keywords) {
-        return postDAO.seachRequestsByKeywords(keywords);
+    public List<Post> seachPostsByKeywords(String keywords) {
+        return postDAO.seachPostsByKeywords(keywords);
     }
 
 }
