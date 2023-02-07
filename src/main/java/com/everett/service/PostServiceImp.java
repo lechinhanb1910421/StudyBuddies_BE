@@ -60,7 +60,7 @@ public class PostServiceImp implements PostServices {
         Post oldPost = getPostById(id);
         post.setPostId(id);
         post.setCreatedTime(oldPost.getCreatedTime());
-        postDAO.updatePost(oldPost);
+        postDAO.updatePost(post);
     }
 
     @Override

@@ -65,9 +65,6 @@ public class Post {
         if (this.userId == null) {
             return true;
         }
-        if (this.createdTime == null) {
-            return true;
-        }
         if (this.content == null) {
             return true;
         }
