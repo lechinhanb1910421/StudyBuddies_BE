@@ -50,6 +50,10 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+      args:
+        DATASOURCE_DB_URL: $DATASOURCE_DB_URL
+        DATASOURCE_DB_USERNAME: $DATASOURCE_DB_USERNAME
+        DATASOURCE_DB_PASSWORD: $DATASOURCE_DB_PASSWORD
     env_file:
       - ./.env
     ports:

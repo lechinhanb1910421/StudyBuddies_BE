@@ -161,7 +161,7 @@
                     </security>
                 </datasource>
                 <datasource jta="true" jndi-name="java:jboss/datasources/nlcnttDS" pool-name="nlcnttDS" enabled="true" use-java-context="true" use-ccm="true">
-                    <connection-url>jdbc:postgresql://db/demo</connection-url>
+                    <connection-url>${env.DATASOURCE_DB_URL}</connection-url>
                     <driver-class>org.postgresql.Driver</driver-class>
                     <driver>postgresql-42.5.0.jar</driver>
                     <pool>
@@ -170,8 +170,8 @@
                         <prefill>true</prefill>
                     </pool>
                     <security>
-                        <user-name>postgres</user-name>
-                        <password>:eCh!nhan@</password>
+                        <user-name>${env.DATASOURCE_DB_USERNAME}</user-name>
+                        <password>${env.DATASOURCE_DB_PASSWORD}</password>
                     </security>
                     <validation>
                         <!-- <check-valid-connection-sql>SELECT 1</check-valid-connection-sql>
@@ -181,30 +181,7 @@
                         <exception-sorter class-name="org.jboss.jca.adapters.jdbc.extensions.postgres.PostgreSQLExceptionSorter" />
                     </validation>
                 </datasource>
-                <!-- <xa-datasource jndi-name="java:jboss/datasources/approvemeDS" pool-name="approvemeDS">
-                    <xa-datasource-property name="ServerName">
-                        postgres
-                    </xa-datasource-property>
-                    <xa-datasource-property name="PortNumber">
-                        5432
-                    </xa-datasource-property>
-                    <xa-datasource-property name="DatabaseName">
-                        demo
-                    </xa-datasource-property>
-                    <xa-datasource-class>org.postgresql.xa.PGXADataSource</xa-datasource-class>
-                    <driver>postgresql-42.5.0.jar</driver>
-                    <security>
-                        <user-name>root</user-name>
-                        <password>Kh@ng831!!</password>
-                    </security>
-                    <validation>
-                        <valid-connection-checker class-name="org.jboss.jca.adapters.jdbc.extensions.postgres.PostgreSQLValidConnectionChecker" />
-                        <exception-sorter class-name="org.jboss.jca.adapters.jdbc.extensions.postgres.PostgreSQLExceptionSorter" />
-                    </validation>
-                </xa-datasource> -->
-                <!-- <drivers>
-                    <driver name="postgresql-jdbc" module="org.postgresql" />
-                </drivers> -->
+
                 <drivers>
                     <driver name="h2" module="com.h2database.h2">
                         <xa-datasource-class>org.h2.jdbcx.JdbcDataSource</xa-datasource-class>
@@ -571,7 +548,7 @@
         <!-- <subsystem xmlns="urn:jboss:domain:keycloak:1.1">
             <secure-deployment name="approveme.war">
                 <realm>test</realm>
-                <auth-server-url>http://keycloak:8080/</auth-server-url>
+                <auth-server-url></auth-server-url>
                 <ssl-required>EXTERNAL</ssl-required>
                 <resource>test_client</resource>
             </secure-deployment>
