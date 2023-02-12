@@ -2,3 +2,4 @@
 target/
 maven_build.bat
 build_and_deploy.bat
+.env
