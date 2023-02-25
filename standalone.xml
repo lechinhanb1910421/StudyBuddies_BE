@@ -38,7 +38,7 @@
         <extension module="org.wildfly.extension.request-controller" />
         <extension module="org.wildfly.extension.security.manager" />
         <extension module="org.wildfly.extension.undertow" />
-        <!-- <extension module="org.keycloak.keycloak-adapter-subsystem"/> -->
+        <extension module="org.keycloak.keycloak-adapter-subsystem"/>
     </extensions>
     <management>
         <security-realms>
@@ -162,8 +162,7 @@
                 </datasource>
                 <datasource jta="true" jndi-name="java:jboss/datasources/nlcnttDS" pool-name="nlcnttDS" enabled="true" use-java-context="true" use-ccm="true">
                     <connection-url>${env.DATASOURCE_DB_URL}</connection-url>
-                    <driver-class>org.postgresql.Driver</driver-class>
-                    <driver>postgresql-42.5.0.jar</driver>
+                    <driver>postgresql</driver>
                     <pool>
                         <min-pool-size>2</min-pool-size>
                         <max-pool-size>20</max-pool-size>
@@ -174,8 +173,6 @@
                         <password>${env.DATASOURCE_DB_PASSWORD}</password>
                     </security>
                     <validation>
-                        <!-- <check-valid-connection-sql>SELECT 1</check-valid-connection-sql>
-                        <validate-on-match>false</validate-on-match> -->
                         <background-validation>false</background-validation>
                         <valid-connection-checker class-name="org.jboss.jca.adapters.jdbc.extensions.postgres.PostgreSQLValidConnectionChecker" />
                         <exception-sorter class-name="org.jboss.jca.adapters.jdbc.extensions.postgres.PostgreSQLExceptionSorter" />
@@ -185,6 +182,9 @@
                 <drivers>
                     <driver name="h2" module="com.h2database.h2">
                         <xa-datasource-class>org.h2.jdbcx.JdbcDataSource</xa-datasource-class>
+                    </driver>
+                    <driver name="postgresql" module="org.postgresql">
+                        <driver-class>org.postgresql.Driver</driver-class>
                     </driver>
                 </drivers>
             </datasources>
@@ -545,14 +545,15 @@
             <client-config name="Standard-Client-Config" />
         </subsystem>
         <subsystem xmlns="urn:jboss:domain:weld:4.0" />
-        <!-- <subsystem xmlns="urn:jboss:domain:keycloak:1.1">
-            <secure-deployment name="approveme.war">
-                <realm>test</realm>
-                <auth-server-url></auth-server-url>
+        <subsystem xmlns="urn:jboss:domain:keycloak:1.1">
+            <secure-deployment name="nlcntt.war">
+                <realm>${env.KEYCLOAK_REALM}</realm>
+                <auth-server-url>${env.KEYCLOAK_AUTH_SERVER}</auth-server-url>
                 <ssl-required>EXTERNAL</ssl-required>
-                <resource>test_client</resource>
+                <public-client>true</public-client>
+                <resource>${env.KEYCLOAK_CLIENT}</resource>
             </secure-deployment>
-        </subsystem> -->
+        </subsystem>
     </profile>
     <interfaces>
         <interface name="management">
