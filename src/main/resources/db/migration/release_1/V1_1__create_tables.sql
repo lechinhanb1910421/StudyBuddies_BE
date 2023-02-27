@@ -24,9 +24,5 @@ user_id_fk FOREIGN KEY (userId) REFERENCES PUBLIC.Users (userId) ON DELETE CASCA
 INSERT INTO PUBLIC.Users ("username", "email", "password", "dateregistered", "usertype", "accountstatus")
 VALUES ('admin', 'admin@example.com','admin', '2023-02-04T02:07:01', 'admin', 'online');
 
-INSERT INTO PUBLIC.Posts("userid", "createdtime", "content", "audiencemode")
-VALUES (1,'2023-02-04T02:07:01', 'The First Post', 'public');
-
-SELECT * FROM PUBLIC.Posts;
 
 SELECT * FROM PUBLIC.Users;
