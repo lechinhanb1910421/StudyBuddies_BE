@@ -4,9 +4,12 @@ import java.sql.Timestamp;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 import org.hibernate.search.annotations.DocumentId;
@@ -50,14 +53,24 @@ public class Post {
     @Column(name = "audienceMode", nullable = false)
     private String audienceMode;
 
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "topicId", nullable = false)
+    private Topic topic;
+
+    // @OneToMany(cascade = CascadeType.ALL)
+    // @JoinColumn(name = "majorId", referencedColumnName = "majorId")
+    // @ManyToOne
+    // private Major major;
+
     public Post() {
     }
 
-    public Post(Long userId, Timestamp createdTime, String content, String audienceMode) {
+    public Post(Long userId, Timestamp createdTime, String content, String audienceMode, Topic topic) {
         this.userId = userId;
         this.createdTime = createdTime;
         this.content = content;
         this.audienceMode = audienceMode;
+        this.topic = topic;
     }
 
     @JsonIgnore
@@ -130,6 +143,14 @@ public class Post {
 
     public void setAudienceMode(String audienceMode) {
         this.audienceMode = audienceMode;
+    }
+
+    public Topic getTopic() {
+        return topic;
+    }
+
+    public void setTopic(Topic topic) {
+        this.topic = topic;
     }
 
 }
