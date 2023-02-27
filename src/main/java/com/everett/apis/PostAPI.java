@@ -33,6 +33,7 @@ public class PostAPI {
     @Produces(MediaType.APPLICATION_JSON)
     public Response getAllPosts() {
         logger.info("Get All Posts");
+        System.out.println("Get All Posts");
         return Response.ok(postService.getAllPosts()).build();
     }
 
@@ -43,6 +44,7 @@ public class PostAPI {
         if (keywords == null) {
             throw new InvalidSearchKeywordException("Keyword must not be null");
         }
+        System.out.println("Search Posts by keyword: " + keywords);
         return Response.ok(postService.seachPostsByKeywords(keywords)).build();
     }
 
@@ -58,6 +60,7 @@ public class PostAPI {
         }
         postService.createPost(post);
         logger.info("New Post was created successfully");
+        System.out.println("New Post was created successfully");
         Message message = new Message("New Post was created successfully");
         // isUpdated.set(true);
         return Response.ok(message).build();
@@ -67,6 +70,7 @@ public class PostAPI {
     @Path("/{id}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getPostById(@PathParam("id") Long id) {
+        System.out.println("Get Post by id: " + id);
         return Response.ok(postService.getPostById(id)).build();
     }
 
@@ -82,6 +86,7 @@ public class PostAPI {
         }
         postService.updatePost(id, post);
         logger.info("Post with id: " + id + " was updated successfully");
+        System.out.println("Post with id: " + id + " was updated successfully");
         Message message = new Message("Post was updated successfully");
         // isUpdated.set(true);
         return Response.ok(message).build();
@@ -93,6 +98,7 @@ public class PostAPI {
     public Response deletePost(@PathParam("id") Long id) {
         postService.deletePost(id);
         logger.info("Post " + id + " was deleted successfully");
+        System.out.println("Post " + id + " was deleted successfully");
         Message message = new Message("Post was deleted successfully");
         // isUpdated.set(true);
         return Response.ok(message).build();
