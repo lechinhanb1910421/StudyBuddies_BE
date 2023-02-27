@@ -23,6 +23,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.everett.models.Post;
+import com.everett.models.Topic;
 import com.everett.services.PostService;
 
 @ExtendWith(MockitoExtension.class)
@@ -35,7 +36,8 @@ public class PostAPITest {
     PostService service;
 
     private Timestamp createdTime;
-    // private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ssZ");
+    // private static final DateTimeFormatter DATE_TIME_FORMATTER =
+    // DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ssZ");
 
     @BeforeAll
     public void setUp() {
@@ -44,7 +46,8 @@ public class PostAPITest {
 
     @Test
     void testcreateLeaveRequestTest() {
-        Post post = new Post(1910421l, createdTime, "Test Post", "public");
+        Topic topic = new Topic();
+        Post post = new Post(1910421l, createdTime, "Test Post", "public", topic);
         assertEquals(200, api.createPost(post).getStatus());
     }
 }
