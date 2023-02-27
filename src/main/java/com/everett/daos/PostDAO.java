@@ -15,7 +15,9 @@ import org.hibernate.search.jpa.Search;
 import org.hibernate.search.query.dsl.QueryBuilder;
 
 import com.everett.exceptions.EmptyEntityException;
+// import com.everett.models.Major;
 import com.everett.models.Post;
+import com.everett.models.Topic;
 
 @Stateless(name = "PostDAO")
 public class PostDAO {
@@ -23,9 +25,13 @@ public class PostDAO {
     EntityManager entityManager;
 
     public Post createPost(Long userId, Timestamp createdTime, String content, String audienceMode) {
-        Post post = new Post(userId, createdTime, content, audienceMode);
+        Post post = null;
         try {
+            Topic topic = entityManager.find(Topic.class, 1l);
+            System.out.println("===== Topic: " + topic);
+            post = new Post(userId, createdTime, content, audienceMode, topic);
             entityManager.persist(post);
+            System.out.println("POST IN DAO " + post);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -50,32 +56,36 @@ public class PostDAO {
                 .buildQueryBuilder()
                 .forEntity(Post.class)
                 .get();
-        String matchString = "";
+        String keywordMatch = "";
         for (String word : keywords.split(" ")) {
-            matchString += word + "* ";
+            keywordMatch += word + "* ";
         }
+        System.out.println(keywordMatch);
         Query searchKeyword = queryBuilder
                 .simpleQueryString()
                 .onField("content")
-                .boostedTo(5f)
-                .andFields("userId")
-                .boostedTo(2f)
+                // .boostedTo(5f)
+                // .andFields("userId")
+                // .boostedTo(2f)
                 .withAndAsDefaultOperator()
-                .matching(matchString)
+                .matching(keywordMatch)
                 .createQuery();
         FullTextQuery jpaQuery = fullTextEntityManager.createFullTextQuery(searchKeyword, Post.class);
         list = jpaQuery.getResultList();
+        System.out.println(list);
         return list;
     }
 
     public List<Post> getAllPosts() {
         List<Post> resList = null;
         try {
-            TypedQuery<Post> postQuery = entityManager.createQuery("FROM Posts p ORDER BY p.postId", Post.class);
+            TypedQuery<Post> postQuery = entityManager
+                    .createQuery("FROM Posts p ORDER BY p.postId", Post.class);
             resList = postQuery.getResultList();
         } catch (Exception e) {
             e.printStackTrace();
         }
+        System.out.println("GET ALL POSTS" + resList);
         return resList;
     }
 
