@@ -1,6 +1,5 @@
 package com.everett.utils;
 
-
 import javax.annotation.PostConstruct;
 import javax.ejb.DependsOn;
 import javax.ejb.Singleton;
@@ -28,7 +27,8 @@ public class InitHibernateSearch {
         FullTextEntityManager fullTextEntityManager = Search.getFullTextEntityManager(entityManager);
         try {
             fullTextEntityManager.createIndexer().startAndWait();
-            logger.info("Indexing successfully");
+            System.out.println("================Indexing successfully");
+            logger.info("================Indexing successfully");
         } catch (InterruptedException e) {
             logger.error(e);
         }
