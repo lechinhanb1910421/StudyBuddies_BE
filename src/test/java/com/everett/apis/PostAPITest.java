@@ -22,6 +22,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import com.everett.models.Major;
 import com.everett.models.Post;
 import com.everett.models.Topic;
 import com.everett.services.PostService;
@@ -47,7 +48,8 @@ public class PostAPITest {
     @Test
     void testcreateLeaveRequestTest() {
         Topic topic = new Topic();
-        Post post = new Post(1910421l, createdTime, "Test Post", "public", topic);
+        Major major = new Major();
+        Post post = new Post(1910421l, createdTime, "Test Post", "public", topic, major);
         assertEquals(200, api.createPost(post).getStatus());
     }
 }
