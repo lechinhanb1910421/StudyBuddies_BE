@@ -57,20 +57,20 @@ public class Post {
     @JoinColumn(name = "topicId", nullable = false)
     private Topic topic;
 
-    // @OneToMany(cascade = CascadeType.ALL)
-    // @JoinColumn(name = "majorId", referencedColumnName = "majorId")
-    // @ManyToOne
-    // private Major major;
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "majorId", nullable = false)
+    private Major major;
 
     public Post() {
     }
 
-    public Post(Long userId, Timestamp createdTime, String content, String audienceMode, Topic topic) {
+    public Post(Long userId, Timestamp createdTime, String content, String audienceMode, Topic topic, Major major) {
         this.userId = userId;
         this.createdTime = createdTime;
         this.content = content;
         this.audienceMode = audienceMode;
         this.topic = topic;
+        this.major = major;
     }
 
     @JsonIgnore
@@ -151,6 +151,14 @@ public class Post {
 
     public void setTopic(Topic topic) {
         this.topic = topic;
+    }
+
+    public Major getMajor() {
+        return major;
+    }
+
+    public void setMajor(Major major) {
+        this.major = major;
     }
 
 }
