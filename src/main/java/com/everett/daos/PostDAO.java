@@ -24,13 +24,14 @@ public class PostDAO {
     @PersistenceContext(unitName = "primary")
     EntityManager entityManager;
 
-    public Post createPost(Long userId, Timestamp createdTime, String content, String audienceMode) {
+    public Major getDefaultMajor() {
+        return entityManager.find(Major.class, 1l);
+    }
+
+    public Post createPost(Long userId, Timestamp createdTime, String content, String audienceMode, Topic topic, Major major) {
         Post post = null;
         try {
-            Topic topic = entityManager.find(Topic.class, 1l);
-            Major major = entityManager.find(Major.class, 1l);
             post = new Post(userId, createdTime, content, audienceMode, topic, major);
-
             entityManager.persist(post);
         } catch (Exception e) {
             e.printStackTrace();
