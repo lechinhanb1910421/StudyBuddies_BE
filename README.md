@@ -7,7 +7,7 @@ Back end side of StudyBuddies Project
 **Student Code:** B1910421 \
 **Course Code:** CT466-07 
 
-## **This project is deployed and run under Docker environment**
+## **This project is deployed and runs on Docker environment**
 
 **Please change the values in [example.env](example.env) file and rename it to ".env" before startup**
 
