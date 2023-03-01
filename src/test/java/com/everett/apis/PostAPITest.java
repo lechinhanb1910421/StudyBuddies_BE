@@ -50,6 +50,6 @@ public class PostAPITest {
         Topic topic = new Topic();
         Major major = new Major();
         Post post = new Post(1910421l, createdTime, "Test Post", "public", topic, major);
-        assertEquals(200, api.createPost(post).getStatus());
+        assertEquals(200, api.createPost(post, 1l, 1l).getStatus());
     }
 }
