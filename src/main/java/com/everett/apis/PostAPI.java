@@ -17,9 +17,9 @@ import javax.ws.rs.core.Response;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import com.everett.dtos.PostDTO;
 import com.everett.exceptions.InvalidSearchKeywordException;
 import com.everett.models.Message;
-import com.everett.models.Post;
 import com.everett.services.PostService;
 
 @Path("/posts")
@@ -52,13 +52,13 @@ public class PostAPI {
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response createPost(Post post, @QueryParam("topicId") Long topicId, @QueryParam("majorId") Long majorId) {
-        if (post.isMissingKeys()) {
+    public Response createPost(PostDTO payload) {
+        if (payload.isMissingKeys()) {
             logger.error("Missing keys in request body");
-            Message errMsg = new Message("Missing keys in request body");
+            Message errMsg = new Message("Missing key(s) in request body");
             throw new WebApplicationException(Response.status(400).entity(errMsg).build());
         }
-        postService.createPost(post, topicId, majorId);
+        postService.createPost(payload);
         logger.info("New Post was created successfully");
         System.out.println("New Post was created successfully");
         Message message = new Message("New Post was created successfully");
@@ -71,21 +71,20 @@ public class PostAPI {
     @Produces(MediaType.APPLICATION_JSON)
     public Response getPostById(@PathParam("id") Long id) {
         System.out.println("Get Post by id: " + id);
-        return Response.ok(postService.getPostById(id)).build();
+        return Response.ok(postService.getPostOutById(id)).build();
     }
 
     @PUT
     @Path("/{id}")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response updatePost(@PathParam("id") Long id, Post post, @QueryParam("topicId") Long topicId,
-            @QueryParam("majorId") Long majorId) {
-        if (post.isMissingKeys()) {
-            logger.error("Alter post request is missing keys");
-            Message message = new Message("Alter post request is missing keys");
+    public Response updatePost(@PathParam("id") Long id, PostDTO payload) {
+        if (payload.isMissingKeys()) {
+            logger.error("Update post request is missing keys");
+            Message message = new Message("Update post request is missing keys");
             throw new WebApplicationException(Response.status(400).entity(message).build());
         }
-        postService.updatePost(id, post, topicId, majorId);
+        postService.updatePost(id, payload);
         logger.info("Post with id: " + id + " was updated successfully");
         System.out.println("Post with id: " + id + " was updated successfully");
         Message message = new Message("Post was updated successfully");
