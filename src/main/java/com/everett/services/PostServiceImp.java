@@ -3,6 +3,7 @@ package com.everett.services;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -10,6 +11,8 @@ import javax.inject.Inject;
 import com.everett.daos.MajorDAO;
 import com.everett.daos.PostDAO;
 import com.everett.daos.TopicDAO;
+import com.everett.dtos.PostDTO;
+import com.everett.dtos.PostOutDTO;
 import com.everett.exceptions.EmptyEntityException;
 import com.everett.exceptions.IdNotFoundException;
 import com.everett.exceptions.InternalServerError;
@@ -33,11 +36,10 @@ public class PostServiceImp implements PostService {
     MajorDAO majorDAO;
 
     @Override
-    public void createPost(Post post, Long topicId, Long majorId) {
-        Timestamp createdTime = post.getCreatedTime();
-        if (createdTime == null) {
-            createdTime = Timestamp.from(Instant.now().truncatedTo(ChronoUnit.SECONDS));
-        }
+    public void createPost(PostDTO payload) {
+        Timestamp createdTime = Timestamp.from(Instant.now().truncatedTo(ChronoUnit.SECONDS));
+        Long topicId = payload.getTopicId();
+        Long majorId = payload.getMajorId();
         Topic topic = null;
         if (topicId == null) {
             topic = topicDAO.getDefaultTopic();
@@ -58,11 +60,18 @@ public class PostServiceImp implements PostService {
                 throw new MajorNotFoundWebException(majorId);
             }
         }
+        Post newPost = new Post(payload.getUserId(), createdTime, payload.getContent(), payload.getAudienceMode(),
+                topic, major);
         try {
-            postDAO.createPost(post.getUserId(), createdTime, post.getContent(), post.getAudienceMode(), topic, major);
+            postDAO.createPost(newPost);
         } catch (Exception ex) {
             throw new InternalServerError(ex.getMessage());
         }
+    }
+
+    @Override
+    public PostOutDTO getPostOutById(Long id) {
+        return new PostOutDTO(getPostById(id));
     }
 
     @Override
@@ -78,8 +87,13 @@ public class PostServiceImp implements PostService {
     }
 
     @Override
-    public List<Post> getAllPosts() {
-        return postDAO.getAllPosts();
+    public List<PostOutDTO> getAllPosts() {
+        List<Post> postList = postDAO.getAllPosts();
+        List<PostOutDTO> results = new ArrayList<>();
+        for (Post post : postList) {
+            results.add(new PostOutDTO(post));
+        }
+        return results;
 
     }
 
@@ -90,34 +104,35 @@ public class PostServiceImp implements PostService {
     }
 
     @Override
-    public void updatePost(Long id, Post post, Long topicId, Long majorId) {
+    public void updatePost(Long id, PostDTO payload) {
         Post oldPost = getPostById(id);
-        post.setPostId(id);
-        post.setCreatedTime(oldPost.getCreatedTime());
-        if (topicId == null) {
-            post.setTopic(oldPost.getTopic());
-        } else {
+        Long topicId = payload.getTopicId();
+        Long majorId = payload.getMajorId();
+        if (topicId != null) {
             try {
-                post.setTopic(topicDAO.getTopicById(topicId));
+                oldPost.setTopic(topicDAO.getTopicById(topicId));
             } catch (TopicNotFoundException e) {
                 throw new TopicNotFoundWebException(topicId);
             }
         }
-        if (majorId == null) {
-            post.setMajor(oldPost.getMajor());
-        } else {
+        if (majorId != null) {
             try {
-                post.setMajor(majorDAO.getMajorById(majorId));
+                oldPost.setMajor(majorDAO.getMajorById(majorId));
             } catch (MajorNotFoundException e) {
                 throw new MajorNotFoundWebException(majorId);
             }
         }
-        postDAO.updatePost(post);
+        postDAO.updatePost(oldPost);
     }
 
     @Override
-    public List<Post> seachPostsByKeywords(String keywords) {
-        return postDAO.seachPostsByKeywords(keywords);
+    public List<PostOutDTO> seachPostsByKeywords(String keywords) {
+        List<Post> postList = postDAO.seachPostsByKeywords(keywords);
+        List<PostOutDTO> results = new ArrayList<>();
+        for (Post post : postList) {
+            results.add(new PostOutDTO(post));
+        }
+        return results;
     }
 
 }

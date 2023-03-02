@@ -1,6 +1,5 @@
 package com.everett.daos;
 
-import java.sql.Timestamp;
 import java.util.List;
 
 import javax.ejb.Stateless;
@@ -15,28 +14,19 @@ import org.hibernate.search.jpa.Search;
 import org.hibernate.search.query.dsl.QueryBuilder;
 
 import com.everett.exceptions.EmptyEntityException;
-import com.everett.models.Major;
 import com.everett.models.Post;
-import com.everett.models.Topic;
 
 @Stateless(name = "PostDAO")
 public class PostDAO {
     @PersistenceContext(unitName = "primary")
     EntityManager entityManager;
 
-    public Major getDefaultMajor() {
-        return entityManager.find(Major.class, 1l);
-    }
-
-    public Post createPost(Long userId, Timestamp createdTime, String content, String audienceMode, Topic topic, Major major) {
-        Post post = null;
+    public void createPost(Post newPost) {
         try {
-            post = new Post(userId, createdTime, content, audienceMode, topic, major);
-            entityManager.persist(post);
+            entityManager.persist(newPost);
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return post;
     }
 
     public Post getPostById(Long id) throws EmptyEntityException {

@@ -2,20 +2,24 @@ package com.everett.services;
 
 import java.util.List;
 
+import com.everett.dtos.PostDTO;
+import com.everett.dtos.PostOutDTO;
 import com.everett.models.Post;
 
 public interface PostService {
 
-    public void createPost(Post post, Long topicId, Long majorId);
+    public void createPost(PostDTO payload);
+
+    public PostOutDTO getPostOutById(Long id);
 
     public Post getPostById(Long id);
 
-    public List<Post> getAllPosts();
+    public List<PostOutDTO> getAllPosts();
 
     public void deletePost(Long id);
 
-    public void updatePost(Long id, Post post, Long topicId, Long majorId);
+    public void updatePost(Long id, PostDTO payload);
 
-    public List<Post> seachPostsByKeywords(String keywords);
+    public List<PostOutDTO> seachPostsByKeywords(String keywords);
 
 }
