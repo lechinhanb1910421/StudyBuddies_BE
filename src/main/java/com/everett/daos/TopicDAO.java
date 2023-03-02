@@ -15,10 +15,16 @@ public class TopicDAO {
     }
 
     public Topic getTopicById(Long id) throws TopicNotFoundException {
+        Topic topic = null;
         try {
-            return entityManager.find(Topic.class, id);
+            topic = entityManager.find(Topic.class, id);
         } catch (Exception e) {
+            e.printStackTrace();
+        }
+        if (topic == null) {
             throw new TopicNotFoundException(id);
+        } else {
+            return topic;
         }
     }
 }

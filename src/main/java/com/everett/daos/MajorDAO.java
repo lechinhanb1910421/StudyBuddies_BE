@@ -15,10 +15,16 @@ public class MajorDAO {
     }
 
     public Major getMajorById(Long id) throws MajorNotFoundException {
+        Major major = null;
         try {
-            return entityManager.find(Major.class, id);
+            major = entityManager.find(Major.class, id);
         } catch (Exception e) {
+            e.printStackTrace();
+        }
+        if (major == null) {
             throw new MajorNotFoundException(id);
+        } else {
+            return major;
         }
     }
 }
