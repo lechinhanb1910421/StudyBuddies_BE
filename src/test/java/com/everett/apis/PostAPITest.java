@@ -22,9 +22,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import com.everett.models.Major;
-import com.everett.models.Post;
-import com.everett.models.Topic;
+import com.everett.dtos.PostDTO;
 import com.everett.services.PostService;
 
 @ExtendWith(MockitoExtension.class)
@@ -47,9 +45,7 @@ public class PostAPITest {
 
     @Test
     void testcreateLeaveRequestTest() {
-        Topic topic = new Topic();
-        Major major = new Major();
-        Post post = new Post(1910421l, createdTime, "Test Post", "public", topic, major);
-        assertEquals(200, api.createPost(post, 1l, 1l).getStatus());
+        PostDTO payload = new PostDTO(1910421l, "Test Post", "public", 1l, 1l);
+        assertEquals(200, api.createPost(payload).getStatus());
     }
 }
