@@ -5,11 +5,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 // import static org.mockito.Mockito.verify;
 // import static org.mockito.Mockito.when;
 
-import java.sql.Timestamp;
-import java.time.Instant;
+// import java.sql.Timestamp;
+// import java.time.Instant;
 // import java.time.ZonedDateTime;
 // import java.time.format.DateTimeFormatter;
-import java.time.temporal.ChronoUnit;
+// import java.time.temporal.ChronoUnit;
 
 // import javax.ws.rs.WebApplicationException;
 
@@ -22,7 +22,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import com.everett.dtos.PostDTO;
+import com.everett.dtos.PostReceiveDTO;
 import com.everett.services.PostService;
 
 @ExtendWith(MockitoExtension.class)
@@ -34,18 +34,18 @@ public class PostAPITest {
     @Mock
     PostService service;
 
-    private Timestamp createdTime;
+    // private Timestamp createdTime;
     // private static final DateTimeFormatter DATE_TIME_FORMATTER =
     // DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ssZ");
 
     @BeforeAll
     public void setUp() {
-        createdTime = Timestamp.from(Instant.now().truncatedTo(ChronoUnit.SECONDS));
+        // createdTime = Timestamp.from(Instant.now().truncatedTo(ChronoUnit.SECONDS));
     }
 
     @Test
     void testcreateLeaveRequestTest() {
-        PostDTO payload = new PostDTO(1910421l, "Test Post", "public", 1l, 1l);
+        PostReceiveDTO payload = new PostReceiveDTO("Test Post", "public", 1l, 1l);
         assertEquals(200, api.createPost(payload).getStatus());
     }
 }
