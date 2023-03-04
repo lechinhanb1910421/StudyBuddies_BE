@@ -77,6 +77,19 @@ public class PostDAO {
         return resList;
     }
 
+    public List<Post> getAllUserPosts(String email) {
+        List<Post> resList = null;
+        try {
+            TypedQuery<Post> postQuery = entityManager.createQuery(
+                    "FROM Posts p JOIN FETCH p.user s WHERE s.email = :email ORDER BY p.postId", Post.class);
+            resList = postQuery.setParameter("email", email).getResultList();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return resList;
+
+    }
+
     public void deletePost(Long id) {
         try {
             entityManager.remove(entityManager.find(Post.class, id));
