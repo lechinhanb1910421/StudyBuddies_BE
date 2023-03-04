@@ -19,7 +19,7 @@ public class MigrationAPI {
     @PostConstruct
     public void initFlyWay() {
         Flyway flyway = Flyway.configure().dataSource(dataSource).load();
-        // flyway.repair();
+        flyway.repair();
         flyway.baseline();
         flyway.migrate();
     }
