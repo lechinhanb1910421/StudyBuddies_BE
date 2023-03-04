@@ -14,15 +14,12 @@ import javax.persistence.Table;
 
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
-import org.hibernate.search.annotations.FieldBridge;
 import org.hibernate.search.annotations.Index;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.Store;
-import org.hibernate.search.bridge.builtin.LongBridge;
 
 import com.everett.utils.TimestampDeserializer;
 import com.everett.utils.TimestampSerializer;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
@@ -36,10 +33,9 @@ public class Post {
     @Column(name = "postId", nullable = false)
     private Long postId;
 
-    @Column(name = "userId", nullable = false)
-    @FieldBridge(impl = LongBridge.class)
-    @Field
-    private Long userId;
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "userId", nullable = false)
+    private User user;
 
     @Column(name = "createdTime", nullable = false)
     @JsonDeserialize(using = TimestampDeserializer.class)
@@ -64,45 +60,13 @@ public class Post {
     public Post() {
     }
 
-    public Post(Long userId, Timestamp createdTime, String content, String audienceMode, Topic topic, Major major) {
-        this.userId = userId;
+    public Post(User user, Timestamp createdTime, String content, String audienceMode, Topic topic, Major major) {
+        this.user = user;
         this.createdTime = createdTime;
         this.content = content;
         this.audienceMode = audienceMode;
         this.topic = topic;
         this.major = major;
-    }
-
-    @JsonIgnore
-    public boolean isMissingKeys() {
-        if (this.userId == null) {
-            return true;
-        }
-        if (this.content == null) {
-            return true;
-        }
-        if (this.audienceMode == null) {
-            return true;
-        }
-        return false;
-
-    }
-
-    @JsonIgnore
-    public boolean isEmpty() {
-        if (this.userId != null) {
-            return false;
-        }
-        if (this.createdTime != null) {
-            return false;
-        }
-        if (this.content != null) {
-            return false;
-        }
-        if (this.audienceMode != null) {
-            return false;
-        }
-        return true;
     }
 
     public Long getPostId() {
@@ -111,14 +75,6 @@ public class Post {
 
     public void setPostId(Long postId) {
         this.postId = postId;
-    }
-
-    public Long getUserId() {
-        return userId;
-    }
-
-    public void setUserId(Long userId) {
-        this.userId = userId;
     }
 
     public Timestamp getCreatedTime() {
@@ -159,6 +115,14 @@ public class Post {
 
     public void setMajor(Major major) {
         this.major = major;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
     }
 
 }
