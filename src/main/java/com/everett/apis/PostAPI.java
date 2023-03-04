@@ -1,5 +1,6 @@
 package com.everett.apis;
 
+import javax.ejb.Stateless;
 import javax.inject.Inject;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
@@ -20,12 +21,14 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.everett.dtos.PostReceiveDTO;
+import com.everett.exceptions.EmptyReactionException;
 import com.everett.exceptions.InvalidSearchKeywordException;
 import com.everett.exceptions.UserNotFoundException;
 import com.everett.models.Message;
 import com.everett.services.PostService;
 
 @Path("/posts")
+@Stateless(name = "PostService")
 public class PostAPI {
     private static final Logger logger = LogManager.getLogger(PostAPI.class);
 
@@ -35,6 +38,7 @@ public class PostAPI {
     @Context
     SecurityContext securityContext;
 
+    // @RolesAllowed({ "USER" })
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public Response getAllPosts() {
@@ -77,6 +81,7 @@ public class PostAPI {
         return Response.ok(message).build();
     }
 
+    // @RolesAllowed({ "ADMIN" })
     @GET
     @Path("/{id}")
     @Produces(MediaType.APPLICATION_JSON)
@@ -114,4 +119,39 @@ public class PostAPI {
         // isUpdated.set(true);
         return Response.ok(message).build();
     }
+
+    @Path("/{id}/react")
+    @POST
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response reactPost(@PathParam("id") Long id) {
+        Message message = new Message("Post was reacted successfully");
+        postService.reactPost(id, securityContext);
+        return Response.ok(message).build();
+    }
+
+    @Path("/{id}/react")
+    @DELETE
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response removeReactPost(@PathParam("id") Long id) {
+        try {
+            postService.removeReactPost(id, securityContext);
+            return Response.ok().build();
+        } catch (Exception e) {
+            Message message = new Message("Can not unset reaction");
+            return Response.ok(message).build();
+        }
+    }
+
+    @Path("/{id}/react")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getAllPostReation(@PathParam("id") Long id) {
+        try {
+            return Response.ok(postService.getAllPostReation(id)).build();
+        } catch (EmptyReactionException e) {
+            Message message = new Message("This post has no reaction yet!");
+            return Response.ok(message).build();
+        }
+    }
+
 }
