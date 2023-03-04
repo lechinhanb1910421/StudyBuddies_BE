@@ -11,14 +11,17 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.SecurityContext;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import com.everett.dtos.PostDTO;
+import com.everett.dtos.PostReceiveDTO;
 import com.everett.exceptions.InvalidSearchKeywordException;
+import com.everett.exceptions.UserNotFoundException;
 import com.everett.models.Message;
 import com.everett.services.PostService;
 
@@ -28,6 +31,9 @@ public class PostAPI {
 
     @Inject
     PostService postService;
+
+    @Context
+    SecurityContext securityContext;
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
@@ -52,13 +58,18 @@ public class PostAPI {
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response createPost(PostDTO payload) {
+    public Response createPost(PostReceiveDTO payload) {
         if (payload.isMissingKeys()) {
             logger.error("Missing keys in request body");
             Message errMsg = new Message("Missing key(s) in request body");
             throw new WebApplicationException(Response.status(400).entity(errMsg).build());
         }
-        postService.createPost(payload);
+        try {
+            postService.createPost(payload, securityContext);
+        } catch (UserNotFoundException e) {
+            Message message = new Message("User not found");
+            throw new WebApplicationException(Response.status(400).entity(message).build());
+        }
         logger.info("New Post was created successfully");
         System.out.println("New Post was created successfully");
         Message message = new Message("New Post was created successfully");
@@ -71,14 +82,14 @@ public class PostAPI {
     @Produces(MediaType.APPLICATION_JSON)
     public Response getPostById(@PathParam("id") Long id) {
         System.out.println("Get Post by id: " + id);
-        return Response.ok(postService.getPostOutById(id)).build();
+        return Response.ok(postService.getPostResponseById(id)).build();
     }
 
     @PUT
     @Path("/{id}")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response updatePost(@PathParam("id") Long id, PostDTO payload) {
+    public Response updatePost(@PathParam("id") Long id, PostReceiveDTO payload) {
         if (payload.isMissingKeys()) {
             logger.error("Update post request is missing keys");
             Message message = new Message("Update post request is missing keys");
