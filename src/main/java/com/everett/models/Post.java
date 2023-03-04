@@ -1,6 +1,8 @@
 package com.everett.models;
 
 import java.sql.Timestamp;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -9,6 +11,8 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
@@ -56,6 +60,12 @@ public class Post {
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "majorId", nullable = false)
     private Major major;
+
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(name = "post_reaction", joinColumns = {
+            @JoinColumn(name = "postId", nullable = false, updatable = false) }, inverseJoinColumns = {
+                    @JoinColumn(name = "userId", nullable = false, updatable = false) })
+    private Set<User> reactions = new HashSet<User>();
 
     public Post() {
     }
@@ -117,12 +127,22 @@ public class Post {
         this.major = major;
     }
 
-    public User getUser() {
+    public User getOwnerUser() {
         return user;
     }
 
-    public void setUser(User user) {
+    public void setOwnerUser(User user) {
         this.user = user;
     }
 
+    public Set<User> getReactedUser() {
+        return reactions;
+    }
+
+    public void setReactedUser(User user) {
+        this.reactions.add(user);
+    }
+    public void unsetReactedUser(User user) {
+        this.reactions.remove(user);
+    }
 }
