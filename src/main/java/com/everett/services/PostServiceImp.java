@@ -7,12 +7,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Inject;
+import javax.ws.rs.core.SecurityContext;
+
+import org.keycloak.KeycloakPrincipal;
+import org.keycloak.representations.AccessToken;
 
 import com.everett.daos.MajorDAO;
 import com.everett.daos.PostDAO;
 import com.everett.daos.TopicDAO;
-import com.everett.dtos.PostDTO;
-import com.everett.dtos.PostOutDTO;
+import com.everett.dtos.PostReceiveDTO;
+import com.everett.dtos.PostResponseDTO;
 import com.everett.exceptions.EmptyEntityException;
 import com.everett.exceptions.IdNotFoundException;
 import com.everett.exceptions.InternalServerError;
@@ -20,12 +24,13 @@ import com.everett.exceptions.MajorNotFoundException;
 import com.everett.exceptions.MajorNotFoundWebException;
 import com.everett.exceptions.TopicNotFoundException;
 import com.everett.exceptions.TopicNotFoundWebException;
+import com.everett.exceptions.UserNotFoundException;
 import com.everett.models.Major;
 import com.everett.models.Post;
 import com.everett.models.Topic;
+import com.everett.models.User;
 
 public class PostServiceImp implements PostService {
-
     @Inject
     PostDAO postDAO;
 
@@ -35,8 +40,12 @@ public class PostServiceImp implements PostService {
     @Inject
     MajorDAO majorDAO;
 
+    @Inject
+    UserService userService;
+
     @Override
-    public void createPost(PostDTO payload) {
+    @SuppressWarnings("rawtypes")
+    public void createPost(PostReceiveDTO payload, SecurityContext securityContext) throws UserNotFoundException {
         Timestamp createdTime = Timestamp.from(Instant.now().truncatedTo(ChronoUnit.SECONDS));
         Long topicId = payload.getTopicId();
         Long majorId = payload.getMajorId();
@@ -60,8 +69,10 @@ public class PostServiceImp implements PostService {
                 throw new MajorNotFoundWebException(majorId);
             }
         }
-        Post newPost = new Post(payload.getUserId(), createdTime, payload.getContent(), payload.getAudienceMode(),
-                topic, major);
+        KeycloakPrincipal principal = (KeycloakPrincipal) securityContext.getUserPrincipal();
+        AccessToken accessToken = principal.getKeycloakSecurityContext().getToken();
+        User user = userService.getUserByEmail(accessToken.getEmail());
+        Post newPost = new Post(user, createdTime, payload.getContent(), payload.getAudienceMode(), topic, major);
         try {
             postDAO.createPost(newPost);
         } catch (Exception ex) {
@@ -70,8 +81,8 @@ public class PostServiceImp implements PostService {
     }
 
     @Override
-    public PostOutDTO getPostOutById(Long id) {
-        return new PostOutDTO(getPostById(id));
+    public PostResponseDTO getPostResponseById(Long id) {
+        return new PostResponseDTO(getPostById(id));
     }
 
     @Override
@@ -87,11 +98,11 @@ public class PostServiceImp implements PostService {
     }
 
     @Override
-    public List<PostOutDTO> getAllPosts() {
+    public List<PostResponseDTO> getAllPosts() {
         List<Post> postList = postDAO.getAllPosts();
-        List<PostOutDTO> results = new ArrayList<>();
+        List<PostResponseDTO> results = new ArrayList<>();
         for (Post post : postList) {
-            results.add(new PostOutDTO(post));
+            results.add(new PostResponseDTO(post));
         }
         return results;
 
@@ -104,7 +115,7 @@ public class PostServiceImp implements PostService {
     }
 
     @Override
-    public void updatePost(Long id, PostDTO payload) {
+    public void updatePost(Long id, PostReceiveDTO payload) {
         Post oldPost = getPostById(id);
         Long topicId = payload.getTopicId();
         Long majorId = payload.getMajorId();
@@ -126,11 +137,24 @@ public class PostServiceImp implements PostService {
     }
 
     @Override
-    public List<PostOutDTO> seachPostsByKeywords(String keywords) {
+    public List<PostResponseDTO> seachPostsByKeywords(String keywords) {
         List<Post> postList = postDAO.seachPostsByKeywords(keywords);
-        List<PostOutDTO> results = new ArrayList<>();
+        List<PostResponseDTO> results = new ArrayList<>();
         for (Post post : postList) {
-            results.add(new PostOutDTO(post));
+            results.add(new PostResponseDTO(post));
+        }
+        return results;
+    }
+
+    @Override
+    @SuppressWarnings("rawtypes")
+    public List<PostResponseDTO> getAllUserPosts(SecurityContext securityContext) {
+        KeycloakPrincipal principal = (KeycloakPrincipal) securityContext.getUserPrincipal();
+        AccessToken accessToken = principal.getKeycloakSecurityContext().getToken();
+        List<Post> postList = postDAO.getAllUserPosts(accessToken.getEmail());
+        List<PostResponseDTO> results = new ArrayList<>();
+        for (Post post : postList) {
+            results.add(new PostResponseDTO(post));
         }
         return results;
     }
