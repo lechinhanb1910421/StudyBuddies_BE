@@ -6,8 +6,10 @@ import javax.ws.rs.core.SecurityContext;
 
 import com.everett.dtos.PostReceiveDTO;
 import com.everett.dtos.PostResponseDTO;
+import com.everett.exceptions.EmptyReactionException;
 import com.everett.exceptions.UserNotFoundException;
 import com.everett.models.Post;
+import com.everett.models.User;
 
 public interface PostService {
 
@@ -27,4 +29,9 @@ public interface PostService {
 
     public List<PostResponseDTO> seachPostsByKeywords(String keywords);
 
+    public void reactPost(Long id, SecurityContext securityContext);
+    
+    public void removeReactPost(Long id, SecurityContext securityContext);
+
+    public List<User> getAllPostReation(Long id) throws EmptyReactionException;
 }

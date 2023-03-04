@@ -18,6 +18,7 @@ import com.everett.daos.TopicDAO;
 import com.everett.dtos.PostReceiveDTO;
 import com.everett.dtos.PostResponseDTO;
 import com.everett.exceptions.EmptyEntityException;
+import com.everett.exceptions.EmptyReactionException;
 import com.everett.exceptions.IdNotFoundException;
 import com.everett.exceptions.InternalServerError;
 import com.everett.exceptions.MajorNotFoundException;
@@ -102,7 +103,14 @@ public class PostServiceImp implements PostService {
         List<Post> postList = postDAO.getAllPosts();
         List<PostResponseDTO> results = new ArrayList<>();
         for (Post post : postList) {
-            results.add(new PostResponseDTO(post));
+            PostResponseDTO responseDTO = new PostResponseDTO(post);
+            try {
+                int reactionCount = getAllPostReation(post.getPostId()).size();
+                responseDTO.setReactCount(Long.valueOf(reactionCount));
+            } catch (EmptyReactionException e) {
+                responseDTO.setReactCount(0l);
+            }
+            results.add(responseDTO);
         }
         return results;
 
@@ -154,9 +162,48 @@ public class PostServiceImp implements PostService {
         List<Post> postList = postDAO.getAllUserPosts(accessToken.getEmail());
         List<PostResponseDTO> results = new ArrayList<>();
         for (Post post : postList) {
-            results.add(new PostResponseDTO(post));
+            PostResponseDTO responseDTO = new PostResponseDTO(post);
+            try {
+                int reactionCount = getAllPostReation(post.getPostId()).size();
+                responseDTO.setReactCount(Long.valueOf(reactionCount));
+            } catch (EmptyReactionException e) {
+                responseDTO.setReactCount(0l);
+            }
+            results.add(responseDTO);
         }
         return results;
     }
+
+    @Override
+    @SuppressWarnings("rawtypes")
+    public void reactPost(Long id, SecurityContext securityContext) {
+        KeycloakPrincipal principal = (KeycloakPrincipal) securityContext.getUserPrincipal();
+        AccessToken accessToken = principal.getKeycloakSecurityContext().getToken();
+        String email = accessToken.getEmail();
+        try {
+            User user = userService.getUserByEmail(email);
+            postDAO.reactPost(id, user);
+        } catch (UserNotFoundException e) {
+        }
+    }
+
+    @Override
+    @SuppressWarnings("rawtypes")
+    public void removeReactPost(Long id, SecurityContext securityContext) {
+        KeycloakPrincipal principal = (KeycloakPrincipal) securityContext.getUserPrincipal();
+        AccessToken accessToken = principal.getKeycloakSecurityContext().getToken();
+        String email = accessToken.getEmail();
+        try {
+            User user = userService.getUserByEmail(email);
+            postDAO.removeReactPost(id, user);
+        } catch (UserNotFoundException e) {
+        }
+    }
+    
+    @Override
+    public List<User> getAllPostReation(Long id) throws EmptyReactionException {
+        return postDAO.getAllPostReation(id);
+    }
+
 
 }
