@@ -14,7 +14,9 @@ import org.hibernate.search.jpa.Search;
 import org.hibernate.search.query.dsl.QueryBuilder;
 
 import com.everett.exceptions.EmptyEntityException;
+import com.everett.exceptions.EmptyReactionException;
 import com.everett.models.Post;
+import com.everett.models.User;
 
 @Stateless(name = "PostDAO")
 public class PostDAO {
@@ -106,4 +108,39 @@ public class PostDAO {
         }
     }
 
+    public void reactPost(Long id, User user) {
+        try {
+            Post post = entityManager.find(Post.class, id);
+            post.setReactedUser(user);
+            entityManager.merge(post);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void removeReactPost(Long id, User user) {
+        try {
+            Post post = entityManager.find(Post.class, id);
+            post.unsetReactedUser(user);
+            entityManager.merge(post);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public List<User> getAllPostReation(Long id) throws EmptyReactionException {
+        List<User> res = null;
+        try {
+            TypedQuery<User> query = entityManager
+                    .createQuery("SELECT r FROM Posts p JOIN p.reactions r WHERE p.postId = :postId", User.class);
+            res = query.setParameter("postId", id).getResultList();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        if (res == null) {
+            throw new EmptyReactionException();
+        } else {
+            return res;
+        }
+    }
 }

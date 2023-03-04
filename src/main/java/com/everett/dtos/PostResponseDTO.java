@@ -8,21 +8,23 @@ public class PostResponseDTO {
     private String content;
     private String topicName;
     private String majorName;
+    private Long reactCount;
 
     public PostResponseDTO() {
     }
 
-    public PostResponseDTO(Long postId, Long userId, String content, String topicName, String majorName) {
+    public PostResponseDTO(Long postId, Long userId, String content, String topicName, String majorName, Long reactCount) {
         this.postId = postId;
         this.userId = userId;
         this.content = content;
         this.topicName = topicName;
         this.majorName = majorName;
+        this.reactCount = reactCount;
     }
 
     public PostResponseDTO(Post post) {
         this.postId = post.getPostId();
-        this.userId = post.getUser().getUserId();
+        this.userId = post.getOwnerUser().getUserId();
         this.content = post.getContent();
         this.topicName = post.getTopic().getTopicName();
         this.majorName = post.getMajor().getMajorName();
@@ -66,6 +68,18 @@ public class PostResponseDTO {
 
     public void setpostId(Long postId) {
         this.postId = postId;
+    }
+
+    public void setPostId(Long postId) {
+        this.postId = postId;
+    }
+
+    public Long getReactCount() {
+        return reactCount;
+    }
+
+    public void setReactCount(Long reactCount) {
+        this.reactCount = reactCount;
     }
 
 }
