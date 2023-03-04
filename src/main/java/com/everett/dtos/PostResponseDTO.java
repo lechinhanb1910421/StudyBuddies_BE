@@ -2,26 +2,27 @@ package com.everett.dtos;
 
 import com.everett.models.Post;
 
-public class PostOutDTO {
-    private Long id;
+public class PostResponseDTO {
+    private Long postId;
     private Long userId;
     private String content;
     private String topicName;
     private String majorName;
 
-    public PostOutDTO() {
+    public PostResponseDTO() {
     }
 
-    public PostOutDTO(Long id, Long userId, String content, String topicName, String majorName) {
+    public PostResponseDTO(Long postId, Long userId, String content, String topicName, String majorName) {
+        this.postId = postId;
         this.userId = userId;
         this.content = content;
         this.topicName = topicName;
         this.majorName = majorName;
     }
 
-    public PostOutDTO(Post post) {
-        this.id = post.getPostId();
-        this.userId = post.getUserId();
+    public PostResponseDTO(Post post) {
+        this.postId = post.getPostId();
+        this.userId = post.getUser().getUserId();
         this.content = post.getContent();
         this.topicName = post.getTopic().getTopicName();
         this.majorName = post.getMajor().getMajorName();
@@ -59,12 +60,12 @@ public class PostOutDTO {
         this.majorName = majorName;
     }
 
-    public Long getId() {
-        return id;
+    public Long getPostId() {
+        return postId;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public void setpostId(Long postId) {
+        this.postId = postId;
     }
 
 }

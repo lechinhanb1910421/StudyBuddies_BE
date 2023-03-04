@@ -2,30 +2,20 @@ package com.everett.dtos;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-public class PostDTO {
-    private Long userId;
+public class PostReceiveDTO {
     private String content;
     private String audienceMode;
     private Long topicId;
     private Long majorId;
 
-    public PostDTO() {
+    public PostReceiveDTO() {
     }
 
-    public PostDTO(Long userId, String content, String audienceMode, Long topicId, Long majorId) {
-        this.userId = userId;
+    public PostReceiveDTO(String content, String audienceMode, Long topicId, Long majorId) {
         this.content = content;
         this.audienceMode = audienceMode;
         this.topicId = topicId;
         this.majorId = majorId;
-    }
-
-    public Long getUserId() {
-        return userId;
-    }
-
-    public void setUserId(Long userId) {
-        this.userId = userId;
     }
 
     public String getContent() {
@@ -62,9 +52,6 @@ public class PostDTO {
 
     @JsonIgnore
     public boolean isMissingKeys() {
-        if (this.userId == null) {
-            return true;
-        }
         if (this.content == null) {
             return true;
         }
