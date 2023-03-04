@@ -123,6 +123,26 @@ limitations under the License.
     </dependencyManagement>
 
     <dependencies>
+        <dependency>
+            <groupId>org.keycloak</groupId>
+            <artifactId>keycloak-core</artifactId>
+            <version>20.0.3</version>
+            <scope>provided</scope>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/org.keycloak/keycloak-adapter-core -->
+        <dependency>
+            <groupId>org.keycloak</groupId>
+            <artifactId>keycloak-adapter-core</artifactId>
+            <version>20.0.3</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.keycloak</groupId>
+            <artifactId>keycloak-adapter-spi</artifactId>
+            <version>20.0.3</version>
+            <scope>provided</scope>
+        </dependency>
+
         <!-- Dependency for Hibernate  search -->
         <dependency>
             <groupId>org.hibernate</groupId>
