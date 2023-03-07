@@ -4,7 +4,6 @@ import java.sql.Timestamp;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 
-import javax.ejb.Stateless;
 import javax.inject.Inject;
 import javax.websocket.server.PathParam;
 import javax.ws.rs.GET;
@@ -27,7 +26,7 @@ import com.everett.models.User;
 import com.everett.services.PostService;
 import com.everett.services.UserService;
 
-@Stateless(name = "UserAPI")
+// @Stateless(name = "UserAPI")
 @Path("/users")
 public class UserAPI {
     @Context
