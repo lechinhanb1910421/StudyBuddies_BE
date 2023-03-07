@@ -4,6 +4,7 @@ import java.sql.Timestamp;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -14,6 +15,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 import org.hibernate.search.annotations.DocumentId;
@@ -66,6 +68,9 @@ public class Post {
             @JoinColumn(name = "postId", nullable = false, updatable = false) }, inverseJoinColumns = {
                     @JoinColumn(name = "userId", nullable = false, updatable = false) })
     private Set<User> reactions = new HashSet<User>();
+
+    @OneToMany(mappedBy = "post", targetEntity = Comment.class, fetch = FetchType.LAZY, orphanRemoval = true, cascade = CascadeType.REMOVE)
+    private Set<Comment> comments = new HashSet<Comment>();
 
     public Post() {
     }
@@ -142,7 +147,20 @@ public class Post {
     public void setReactedUser(User user) {
         this.reactions.add(user);
     }
+
     public void unsetReactedUser(User user) {
         this.reactions.remove(user);
     }
+
+    // public Set<Comment> getCommentUser() {
+    // return comments;
+    // }
+
+    // public void setComment(Comment comment) {
+    // this.comments.add(comment);
+    // }
+
+    // public void unsetReactedUser(Comment comment) {
+    // this.comments.remove(comment);
+    // }
 }

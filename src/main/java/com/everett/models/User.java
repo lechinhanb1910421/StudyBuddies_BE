@@ -1,14 +1,18 @@
 package com.everett.models;
 
 import java.sql.Timestamp;
+import java.util.HashSet;
 import java.util.Set;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 import com.everett.utils.TimestampDeserializer;
@@ -49,6 +53,9 @@ public class User {
 
     @ManyToMany(mappedBy = "reactions")
     private Set<Post> posts;
+
+    @OneToMany(mappedBy = "user", targetEntity = Comment.class, fetch = FetchType.LAZY, orphanRemoval = true, cascade = CascadeType.REMOVE)
+    private Set<Comment> comments = new HashSet<Comment>();
 
     public User() {
     }
