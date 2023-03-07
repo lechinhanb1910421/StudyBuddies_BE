@@ -12,11 +12,13 @@ import javax.ws.rs.core.SecurityContext;
 import org.keycloak.KeycloakPrincipal;
 import org.keycloak.representations.AccessToken;
 
+import com.everett.daos.CommentDAO;
 import com.everett.daos.MajorDAO;
 import com.everett.daos.PostDAO;
 import com.everett.daos.TopicDAO;
 import com.everett.dtos.PostReceiveDTO;
 import com.everett.dtos.PostResponseDTO;
+import com.everett.exceptions.EmptyCommentException;
 import com.everett.exceptions.EmptyEntityException;
 import com.everett.exceptions.EmptyReactionException;
 import com.everett.exceptions.IdNotFoundException;
@@ -26,6 +28,7 @@ import com.everett.exceptions.MajorNotFoundWebException;
 import com.everett.exceptions.TopicNotFoundException;
 import com.everett.exceptions.TopicNotFoundWebException;
 import com.everett.exceptions.UserNotFoundException;
+import com.everett.models.Comment;
 import com.everett.models.Major;
 import com.everett.models.Post;
 import com.everett.models.Topic;
@@ -40,6 +43,9 @@ public class PostServiceImp implements PostService {
 
     @Inject
     MajorDAO majorDAO;
+
+    @Inject
+    CommentDAO commentDAO;
 
     @Inject
     UserService userService;
@@ -93,7 +99,7 @@ public class PostServiceImp implements PostService {
         }
         try {
             return postDAO.getPostById(id);
-        } catch (EmptyEntityException ex) {
+        } catch (EmptyEntityException e) {
             throw new IdNotFoundException(id);
         }
     }
@@ -104,11 +110,17 @@ public class PostServiceImp implements PostService {
         List<PostResponseDTO> results = new ArrayList<>();
         for (Post post : postList) {
             PostResponseDTO responseDTO = new PostResponseDTO(post);
+            long reactionCount = 0;
+            long commentCount = 0;
             try {
-                int reactionCount = getAllPostReation(post.getPostId()).size();
-                responseDTO.setReactCount(Long.valueOf(reactionCount));
+                reactionCount = getAllPostReation(post.getPostId()).size();
+                commentCount = getCommentsByPostId(post.getPostId()).size();
+                responseDTO.setReactsCount(reactionCount);
+                responseDTO.setCommentsCount(commentCount);
             } catch (EmptyReactionException e) {
-                responseDTO.setReactCount(0l);
+                responseDTO.setReactsCount(0l);
+            } catch (EmptyCommentException e) {
+                responseDTO.setCommentsCount(0l);
             }
             results.add(responseDTO);
         }
@@ -124,7 +136,8 @@ public class PostServiceImp implements PostService {
 
     @Override
     public void updatePost(Long id, PostReceiveDTO payload) {
-        Post oldPost = getPostById(id);
+        Post oldPost;
+        oldPost = getPostById(id);
         Long topicId = payload.getTopicId();
         Long majorId = payload.getMajorId();
         if (topicId != null) {
@@ -163,11 +176,17 @@ public class PostServiceImp implements PostService {
         List<PostResponseDTO> results = new ArrayList<>();
         for (Post post : postList) {
             PostResponseDTO responseDTO = new PostResponseDTO(post);
+            long reactionCount = 0;
+            long commentCount = 0;
             try {
-                int reactionCount = getAllPostReation(post.getPostId()).size();
-                responseDTO.setReactCount(Long.valueOf(reactionCount));
+                reactionCount = getAllPostReation(post.getPostId()).size();
+                commentCount = getCommentsByPostId(post.getPostId()).size();
+                responseDTO.setReactsCount(reactionCount);
+                responseDTO.setCommentsCount(commentCount);
             } catch (EmptyReactionException e) {
-                responseDTO.setReactCount(0l);
+                responseDTO.setReactsCount(0l);
+            } catch (EmptyCommentException e) {
+                responseDTO.setCommentsCount(0l);
             }
             results.add(responseDTO);
         }
@@ -199,11 +218,15 @@ public class PostServiceImp implements PostService {
         } catch (UserNotFoundException e) {
         }
     }
-    
+
     @Override
     public List<User> getAllPostReation(Long id) throws EmptyReactionException {
         return postDAO.getAllPostReation(id);
     }
 
+    public List<Comment> getCommentsByPostId(Long postId) throws EmptyCommentException {
+        return commentDAO.getCommentsByPostId(postId);
+
+    }
 
 }
