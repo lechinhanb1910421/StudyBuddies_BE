@@ -1,6 +1,5 @@
 package com.everett.apis;
 
-import javax.ejb.Stateless;
 import javax.inject.Inject;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
@@ -28,7 +27,7 @@ import com.everett.models.Message;
 import com.everett.services.PostService;
 
 @Path("/posts")
-@Stateless(name = "PostService")
+// @Stateless(name = "PostAPI")
 public class PostAPI {
     private static final Logger logger = LogManager.getLogger(PostAPI.class);
 
@@ -149,7 +148,7 @@ public class PostAPI {
         try {
             return Response.ok(postService.getAllPostReation(id)).build();
         } catch (EmptyReactionException e) {
-            Message message = new Message("This post has no reaction yet!");
+            Message message = new Message("This post has no reaction yet");
             return Response.ok(message).build();
         }
     }
