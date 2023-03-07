@@ -14,8 +14,11 @@ DROP COLUMN userId;
 ALTER TABLE PUBLIC.Posts
 ADD COLUMN userId BIGINT NOT NULL;
 
+INSERT INTO PUBLIC.Posts(userId, createdTime, content, audienceMode)
+VALUES (1, '2023-03-03T02:27:01Z', 'First Post', 'public');
+
 INSERT INTO PUBLIC.Users (loginName, givenName, familyName, email, createdDate, accountStatus)
-VALUES ('admin', 'admin', 'ad', 'admin@example.com', '2022-12-22T07:27:01+0700', 'testing');
+VALUES ('b1910421', 'Nhan', 'Le Nguyen Chi', 'nhanb1910421@student.ctu.edu.vn', '2023-02-27T02:27:01Z', 'active');
 
 ALTER TABLE PUBLIC.Posts ADD CONSTRAINT 
 user_post_id_fk FOREIGN KEY (userId) REFERENCES PUBLIC.Users (userId);

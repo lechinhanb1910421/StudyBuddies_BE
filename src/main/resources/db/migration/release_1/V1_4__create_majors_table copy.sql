@@ -27,4 +27,3 @@ VALUES ('Computer Network and Data Communication', 'Posts that are related to Co
 INSERT INTO PUBLIC.Majors("majorname", "majordescription", "followers")
 VALUES ('Multimedia Communication', 'Posts that are related to Multimedia Communication major', 272);
 
-SELECT * FROM PUBLIC.Majors;
