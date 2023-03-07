@@ -8,18 +8,21 @@ public class PostResponseDTO {
     private String content;
     private String topicName;
     private String majorName;
-    private Long reactCount;
+    private Long reactsCount;
+    private Long commentsCount;
 
     public PostResponseDTO() {
     }
 
-    public PostResponseDTO(Long postId, Long userId, String content, String topicName, String majorName, Long reactCount) {
+    public PostResponseDTO(Long postId, Long userId, String content, String topicName, String majorName,
+            Long reactsCount, Long commentsCount) {
         this.postId = postId;
         this.userId = userId;
         this.content = content;
         this.topicName = topicName;
         this.majorName = majorName;
-        this.reactCount = reactCount;
+        this.reactsCount = reactsCount;
+        this.commentsCount = commentsCount;
     }
 
     public PostResponseDTO(Post post) {
@@ -74,12 +77,20 @@ public class PostResponseDTO {
         this.postId = postId;
     }
 
-    public Long getReactCount() {
-        return reactCount;
+    public Long getReactsCount() {
+        return reactsCount;
     }
 
-    public void setReactCount(Long reactCount) {
-        this.reactCount = reactCount;
+    public void setReactsCount(Long reactsCount) {
+        this.reactsCount = reactsCount;
+    }
+
+    public Long getCommentsCount() {
+        return commentsCount;
+    }
+
+    public void setCommentsCount(Long commentsCount) {
+        this.commentsCount = commentsCount;
     }
 
 }
