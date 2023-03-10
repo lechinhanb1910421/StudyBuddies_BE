@@ -4,8 +4,8 @@ import java.util.List;
 
 import javax.ws.rs.core.SecurityContext;
 
-import com.everett.exceptions.UserNotFoundException;
-import com.everett.exceptions.UserPersistedException;
+import com.everett.exceptions.checkedExceptions.UserNotFoundException;
+import com.everett.exceptions.checkedExceptions.UserPersistedException;
 import com.everett.models.User;
 
 public interface UserService {

@@ -1,10 +1,9 @@
 package com.everett.daos;
 
-import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 
-import com.everett.exceptions.TopicNotFoundException;
+import com.everett.exceptions.checkedExceptions.TopicNotFoundException;
 import com.everett.models.Topic;
 
 public class TopicDAO {

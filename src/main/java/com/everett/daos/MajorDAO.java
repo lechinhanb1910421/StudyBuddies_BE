@@ -1,10 +1,9 @@
 package com.everett.daos;
 
-import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 
-import com.everett.exceptions.MajorNotFoundException;
+import com.everett.exceptions.checkedExceptions.MajorNotFoundException;
 import com.everett.models.Major;
 
 public class MajorDAO {

@@ -17,7 +17,8 @@ import org.keycloak.representations.AccessToken;
 
 import com.everett.daos.CommentDAO;
 import com.everett.dtos.CommentResponseDTO;
-import com.everett.exceptions.UserNotFoundException;
+import com.everett.exceptions.checkedExceptions.CommentNotFoundException;
+import com.everett.exceptions.checkedExceptions.UserNotFoundException;
 import com.everett.models.Comment;
 import com.everett.models.Message;
 import com.everett.models.Post;
@@ -40,14 +41,9 @@ public class CommentServiceImp implements CommentService {
     public void addComment(Long postId, String content, SecurityContext context) {
         try {
             Post post = postService.getPostById(postId);
-            System.out.println("POST COMMENT IN SERVICE");
-            System.out.println(post.getPostId() + " " + post.getContent());
-
             KeycloakPrincipal principal = (KeycloakPrincipal) context.getUserPrincipal();
             AccessToken accessToken = principal.getKeycloakSecurityContext().getToken();
             User user = userService.getUserByEmail(accessToken.getEmail());
-            System.out.println("USER IN SERVICE ");
-            System.out.println(user);
 
             Timestamp createdTime = Timestamp.from(Instant.now().truncatedTo(ChronoUnit.SECONDS));
 
@@ -67,6 +63,12 @@ public class CommentServiceImp implements CommentService {
             results.add(new CommentResponseDTO(elememt));
         });
         return results;
+    }
+
+    @Override
+    public void deleteComment(Long cmtId) throws CommentNotFoundException {
+        commentDAO.deleteComment(cmtId);
+
     }
 
 }

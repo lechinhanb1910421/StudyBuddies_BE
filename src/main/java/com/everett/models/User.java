@@ -17,6 +17,7 @@ import javax.persistence.Table;
 
 import com.everett.utils.TimestampDeserializer;
 import com.everett.utils.TimestampSerializer;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
@@ -45,14 +46,14 @@ public class User {
     @JsonSerialize(using = TimestampSerializer.class)
     private Timestamp createdDate;
 
-    // @Column(name = "userRole", nullable = false)
-    // private String userRole;
-
     @Column(name = "accountStatus", nullable = false)
     private String accountStatus;
 
-    @ManyToMany(mappedBy = "reactions")
-    private Set<Post> posts;
+    @OneToMany(mappedBy = "user", targetEntity = Post.class, fetch = FetchType.LAZY, orphanRemoval = true, cascade = CascadeType.REMOVE)
+    private Set<Post> posts = new HashSet<Post>();
+
+    @ManyToMany(mappedBy = "reactions", fetch = FetchType.LAZY)
+    private Set<Post> reactions = new HashSet<Post>();
 
     @OneToMany(mappedBy = "user", targetEntity = Comment.class, fetch = FetchType.LAZY, orphanRemoval = true, cascade = CascadeType.REMOVE)
     private Set<Comment> comments = new HashSet<Comment>();
@@ -119,14 +120,6 @@ public class User {
         this.createdDate = createdDate;
     }
 
-    // public String getUserRole() {
-    // return userRole;
-    // }
-
-    // public void setUserRole(String userRole) {
-    // this.userRole = userRole;
-    // }
-
     public String getAccountStatus() {
         return accountStatus;
     }
@@ -139,5 +132,32 @@ public class User {
     public String toString() {
         return "[User: " + userId + ", email: " + email + ", userName: " + givenName + " " + familyName
                 + ", loginName: " + loginName + "]";
+    }
+
+    @JsonIgnore
+    public Set<Post> getReactions() {
+        return reactions;
+    }
+
+    public void setReactions(Set<Post> reactions) {
+        this.reactions = reactions;
+    }
+
+    @JsonIgnore
+    public Set<Comment> getComments() {
+        return comments;
+    }
+
+    public void setComments(Set<Comment> comments) {
+        this.comments = comments;
+    }
+
+    @JsonIgnore
+    public Set<Post> getPosts() {
+        return posts;
+    }
+
+    public void setPosts(Set<Post> posts) {
+        this.posts = posts;
     }
 }

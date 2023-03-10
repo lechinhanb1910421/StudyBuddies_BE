@@ -13,8 +13,8 @@ import org.keycloak.KeycloakPrincipal;
 import org.keycloak.representations.AccessToken;
 
 import com.everett.daos.UserDAO;
-import com.everett.exceptions.UserNotFoundException;
-import com.everett.exceptions.UserPersistedException;
+import com.everett.exceptions.checkedExceptions.UserNotFoundException;
+import com.everett.exceptions.checkedExceptions.UserPersistedException;
 import com.everett.models.User;
 
 @Stateless
