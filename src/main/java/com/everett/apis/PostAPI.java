@@ -20,14 +20,14 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.everett.dtos.PostReceiveDTO;
-import com.everett.exceptions.EmptyReactionException;
-import com.everett.exceptions.InvalidSearchKeywordException;
-import com.everett.exceptions.UserNotFoundException;
+import com.everett.exceptions.checkedExceptions.EmptyEntityException;
+import com.everett.exceptions.checkedExceptions.EmptyReactionException;
+import com.everett.exceptions.checkedExceptions.UserNotFoundException;
+import com.everett.exceptions.webExceptions.InvalidSearchKeywordException;
 import com.everett.models.Message;
 import com.everett.services.PostService;
 
 @Path("/posts")
-// @Stateless(name = "PostAPI")
 public class PostAPI {
     private static final Logger logger = LogManager.getLogger(PostAPI.class);
 
@@ -37,12 +37,10 @@ public class PostAPI {
     @Context
     SecurityContext securityContext;
 
-    // @RolesAllowed({ "USER" })
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public Response getAllPosts() {
-        logger.info("Get All Posts");
-        System.out.println("Get All Posts");
+        logger.info("GET ALL POSTS");
         return Response.ok(postService.getAllPosts()).build();
     }
 
@@ -53,7 +51,7 @@ public class PostAPI {
         if (keywords == null) {
             throw new InvalidSearchKeywordException("Keyword must not be null");
         }
-        System.out.println("Search Posts by keyword: " + keywords);
+        logger.info("SEARCH POSTS BY KEYWORD: " + keywords);
         return Response.ok(postService.seachPostsByKeywords(keywords)).build();
     }
 
@@ -63,7 +61,7 @@ public class PostAPI {
     @Produces(MediaType.APPLICATION_JSON)
     public Response createPost(PostReceiveDTO payload) {
         if (payload.isMissingKeys()) {
-            logger.error("Missing keys in request body");
+            logger.error("MISSING KEYS IN REQUEST BODY");
             Message errMsg = new Message("Missing key(s) in request body");
             throw new WebApplicationException(Response.status(400).entity(errMsg).build());
         }
@@ -73,19 +71,17 @@ public class PostAPI {
             Message message = new Message("User not found");
             throw new WebApplicationException(Response.status(400).entity(message).build());
         }
-        logger.info("New Post was created successfully");
-        System.out.println("New Post was created successfully");
+        logger.info("NEW POST WAS CREATED SUCCESSFULLY FROM");
         Message message = new Message("New Post was created successfully");
         // isUpdated.set(true);
         return Response.ok(message).build();
     }
 
-    // @RolesAllowed({ "ADMIN" })
     @GET
     @Path("/{id}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getPostById(@PathParam("id") Long id) {
-        System.out.println("Get Post by id: " + id);
+        logger.info("GET POST BY ID: " + id);
         return Response.ok(postService.getPostResponseById(id)).build();
     }
 
@@ -95,13 +91,13 @@ public class PostAPI {
     @Produces(MediaType.APPLICATION_JSON)
     public Response updatePost(@PathParam("id") Long id, PostReceiveDTO payload) {
         if (payload.isMissingKeys()) {
-            logger.error("Update post request is missing keys");
+            logger.error("UPDATE POST REQUEST IS MISSING KEYS");
             Message message = new Message("Update post request is missing keys");
             throw new WebApplicationException(Response.status(400).entity(message).build());
         }
         postService.updatePost(id, payload);
         logger.info("Post with id: " + id + " was updated successfully");
-        System.out.println("Post with id: " + id + " was updated successfully");
+        logger.info("POST WITH ID: " + id + " WAS UPDATED SUCCESSFULLY");
         Message message = new Message("Post was updated successfully");
         // isUpdated.set(true);
         return Response.ok(message).build();
@@ -112,7 +108,7 @@ public class PostAPI {
     @Produces(MediaType.APPLICATION_JSON)
     public Response deletePost(@PathParam("id") Long id) {
         postService.deletePost(id);
-        logger.info("Post " + id + " was deleted successfully");
+        logger.info("POST " + id + " WAS DELETED SUCCESSFULLY");
         System.out.println("Post " + id + " was deleted successfully");
         Message message = new Message("Post was deleted successfully");
         // isUpdated.set(true);
@@ -150,6 +146,9 @@ public class PostAPI {
         } catch (EmptyReactionException e) {
             Message message = new Message("This post has no reaction yet");
             return Response.ok(message).build();
+        } catch (EmptyEntityException e2) {
+            Message message = new Message("Post with id: " + id + " not found");
+            throw new WebApplicationException(Response.status(400).entity(message).build());
         }
     }
 

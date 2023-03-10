@@ -16,19 +16,22 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import org.keycloak.KeycloakPrincipal;
 import org.keycloak.representations.AccessToken;
 
-import com.everett.exceptions.UserNotFoundException;
-import com.everett.exceptions.UserPersistedException;
+import com.everett.exceptions.checkedExceptions.UserNotFoundException;
+import com.everett.exceptions.checkedExceptions.UserPersistedException;
 import com.everett.models.Message;
 import com.everett.models.User;
 import com.everett.services.PostService;
 import com.everett.services.UserService;
 
-// @Stateless(name = "UserAPI")
 @Path("/users")
 public class UserAPI {
+    private static final Logger logger = LogManager.getLogger(UserAPI.class);
     @Context
     SecurityContext securityContext;
 
@@ -91,6 +94,7 @@ public class UserAPI {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public Response getAllUserPost() {
+        logger.info("GET ALL USER POSTS");
         return Response.ok(postService.getAllUserPosts(securityContext)).build();
     }
 }
