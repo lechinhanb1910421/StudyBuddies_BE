@@ -4,10 +4,10 @@
         <Console name="ConsoleAppender" target="SYSTEM_OUT">
             <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n" />
         </Console>
-        <!-- <File name="FileAppender" fileName="application-${date:yyyyMMdd}.log"
-        immediateFlush="false" append="true">
-            <PatternLayout pattern="%d{yyy-MM-dd
-        HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
+        <!-- <File name="LogFileAppender" fileName="${sys:logFileName:-default}" append="false">
+            <PatternLayout>
+                <Pattern>%d [%t] %p - %m%n</Pattern>
+            </PatternLayout>
         </File> -->
         <RollingFile name="RollingFile" fileName="${env:JBOSS_HOME}/standalone/log/application.log"
             filePattern="${env:JBOSS_HOME}/standalone/log/${date:yyyy-MM}/app-%d{MM-dd-yyyy}-%i.log">
@@ -18,7 +18,19 @@
         </RollingFile>
     </Appenders>
     <Loggers>
-        <Logger name="com.aavn.api.RequestAPI" level="info" additivity="false">
+        <Logger name="com.everett.apis.PostAPI" level="info" additivity="false">
+            <AppenderRef ref="ConsoleAppender" />
+            <AppenderRef ref="RollingFile" />
+        </Logger>
+        <Logger name="com.everett.apis.UserAPI" level="info" additivity="false">
+            <AppenderRef ref="ConsoleAppender" />
+            <AppenderRef ref="RollingFile" />
+        </Logger>
+        <Logger name="com.everett.apis.CommentAPI" level="info" additivity="false">
+            <AppenderRef ref="ConsoleAppender" />
+            <AppenderRef ref="RollingFile" />
+        </Logger>
+        <Logger name="com.everett.services.PostService" level="info" additivity="false">
             <AppenderRef ref="ConsoleAppender" />
             <AppenderRef ref="RollingFile" />
         </Logger>

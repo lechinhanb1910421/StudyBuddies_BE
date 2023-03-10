@@ -40,7 +40,7 @@ services:
       - '$SERVER_HOST_PORT:$SERVER_CONTAINER_PORT'
     volumes:
       - './:/src'
-      - 'server:$SERVER_LOG_DIR'
+      - 'server:/opt/jboss/wildfly/standalone/log'
     networks:
       - nlcntt-network
 networks:
