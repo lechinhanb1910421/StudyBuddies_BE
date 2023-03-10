@@ -1,4 +1,4 @@
-package com.everett.exceptions;
+package com.everett.exceptions.checkedExceptions;
 
 public class MajorNotFoundException extends Exception {
     public MajorNotFoundException(Long id) {

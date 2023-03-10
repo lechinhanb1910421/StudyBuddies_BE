@@ -1,4 +1,4 @@
-package com.everett.exceptions;
+package com.everett.exceptions.checkedExceptions;
 
 public class UserNotFoundException extends Exception {
     public UserNotFoundException(Long id) {

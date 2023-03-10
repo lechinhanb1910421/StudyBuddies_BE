@@ -1,4 +1,4 @@
-package com.everett.exceptions;
+package com.everett.exceptions.webExceptions;
 
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
