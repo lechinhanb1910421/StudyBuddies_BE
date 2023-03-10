@@ -39,7 +39,7 @@ public class Post {
     @Column(name = "postId", nullable = false)
     private Long postId;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "userId", nullable = false)
     private User user;
 
@@ -55,11 +55,11 @@ public class Post {
     @Column(name = "audienceMode", nullable = false)
     private String audienceMode;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "topicId", nullable = false)
     private Topic topic;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "majorId", nullable = false)
     private Major major;
 
@@ -152,15 +152,15 @@ public class Post {
         this.reactions.remove(user);
     }
 
-    // public Set<Comment> getCommentUser() {
-    // return comments;
-    // }
+    public Set<Comment> getCommentUser() {
+        return comments;
+    }
 
-    // public void setComment(Comment comment) {
-    // this.comments.add(comment);
-    // }
+    public void setComment(Comment comment) {
+        this.comments.add(comment);
+    }
 
-    // public void unsetReactedUser(Comment comment) {
-    // this.comments.remove(comment);
-    // }
+    public void unsetReactedUser(Comment comment) {
+        this.comments.remove(comment);
+    }
 }

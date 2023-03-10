@@ -4,12 +4,18 @@ import java.sql.Timestamp;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.ejb.Stateless;
+import javax.ejb.TransactionAttribute;
+import javax.ejb.TransactionAttributeType;
 import javax.inject.Inject;
 import javax.ws.rs.core.SecurityContext;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.keycloak.KeycloakPrincipal;
 import org.keycloak.representations.AccessToken;
 
@@ -17,18 +23,19 @@ import com.everett.daos.CommentDAO;
 import com.everett.daos.MajorDAO;
 import com.everett.daos.PostDAO;
 import com.everett.daos.TopicDAO;
+import com.everett.daos.UserDAO;
 import com.everett.dtos.PostReceiveDTO;
 import com.everett.dtos.PostResponseDTO;
-import com.everett.exceptions.EmptyCommentException;
-import com.everett.exceptions.EmptyEntityException;
-import com.everett.exceptions.EmptyReactionException;
-import com.everett.exceptions.IdNotFoundException;
-import com.everett.exceptions.InternalServerError;
-import com.everett.exceptions.MajorNotFoundException;
-import com.everett.exceptions.MajorNotFoundWebException;
-import com.everett.exceptions.TopicNotFoundException;
-import com.everett.exceptions.TopicNotFoundWebException;
-import com.everett.exceptions.UserNotFoundException;
+import com.everett.exceptions.checkedExceptions.EmptyCommentException;
+import com.everett.exceptions.checkedExceptions.EmptyEntityException;
+import com.everett.exceptions.checkedExceptions.EmptyReactionException;
+import com.everett.exceptions.checkedExceptions.MajorNotFoundException;
+import com.everett.exceptions.checkedExceptions.TopicNotFoundException;
+import com.everett.exceptions.checkedExceptions.UserNotFoundException;
+import com.everett.exceptions.webExceptions.IdNotFoundException;
+import com.everett.exceptions.webExceptions.InternalServerError;
+import com.everett.exceptions.webExceptions.MajorNotFoundWebException;
+import com.everett.exceptions.webExceptions.TopicNotFoundWebException;
 import com.everett.models.Comment;
 import com.everett.models.Major;
 import com.everett.models.Post;
@@ -37,6 +44,7 @@ import com.everett.models.User;
 
 @Stateless
 public class PostServiceImp implements PostService {
+    private static final Logger logger = LogManager.getLogger(PostService.class);
     @Inject
     PostDAO postDAO;
 
@@ -45,6 +53,9 @@ public class PostServiceImp implements PostService {
 
     @Inject
     MajorDAO majorDAO;
+
+    @Inject
+    UserDAO userDAO;
 
     @Inject
     CommentDAO commentDAO;
@@ -81,6 +92,7 @@ public class PostServiceImp implements PostService {
         KeycloakPrincipal principal = (KeycloakPrincipal) securityContext.getUserPrincipal();
         AccessToken accessToken = principal.getKeycloakSecurityContext().getToken();
         User user = userService.getUserByEmail(accessToken.getEmail());
+        logger.info("CREATING POST FOR USER: " + user.getLoginName());
         Post newPost = new Post(user, createdTime, payload.getContent(), payload.getAudienceMode(), topic, major);
         try {
             postDAO.createPost(newPost);
@@ -90,8 +102,13 @@ public class PostServiceImp implements PostService {
     }
 
     @Override
+    @TransactionAttribute(TransactionAttributeType.REQUIRED)
     public PostResponseDTO getPostResponseById(Long id) {
-        return new PostResponseDTO(getPostById(id));
+        Post post = getPostById(id);
+        PostResponseDTO result = new PostResponseDTO(post);
+        result.setReactsCount(postDAO.getAllPostReactionsCount(id));
+        result.setCommentsCount(postDAO.getAllPostCommentsCount(id));
+        return result;
     }
 
     @Override
@@ -107,23 +124,14 @@ public class PostServiceImp implements PostService {
     }
 
     @Override
+    @TransactionAttribute(TransactionAttributeType.REQUIRED)
     public List<PostResponseDTO> getAllPosts() {
         List<Post> postList = postDAO.getAllPosts();
         List<PostResponseDTO> results = new ArrayList<>();
         for (Post post : postList) {
             PostResponseDTO responseDTO = new PostResponseDTO(post);
-            long reactionCount = 0;
-            long commentCount = 0;
-            try {
-                reactionCount = getAllPostReation(post.getPostId()).size();
-                commentCount = getCommentsByPostId(post.getPostId()).size();
-                responseDTO.setReactsCount(reactionCount);
-                responseDTO.setCommentsCount(commentCount);
-            } catch (EmptyReactionException e) {
-                responseDTO.setReactsCount(0l);
-            } catch (EmptyCommentException e) {
-                responseDTO.setCommentsCount(0l);
-            }
+            responseDTO.setReactsCount(postDAO.getAllPostReactionsCount(post.getPostId()));
+            responseDTO.setCommentsCount(postDAO.getAllPostCommentsCount(post.getPostId()));
             results.add(responseDTO);
         }
         return results;
@@ -137,6 +145,7 @@ public class PostServiceImp implements PostService {
     }
 
     @Override
+    @TransactionAttribute(TransactionAttributeType.REQUIRED)
     public void updatePost(Long id, PostReceiveDTO payload) {
         Post oldPost;
         oldPost = getPostById(id);
@@ -171,26 +180,30 @@ public class PostServiceImp implements PostService {
 
     @Override
     @SuppressWarnings("rawtypes")
+    @TransactionAttribute(TransactionAttributeType.REQUIRED)
     public List<PostResponseDTO> getAllUserPosts(SecurityContext securityContext) {
         KeycloakPrincipal principal = (KeycloakPrincipal) securityContext.getUserPrincipal();
         AccessToken accessToken = principal.getKeycloakSecurityContext().getToken();
-        List<Post> postList = postDAO.getAllUserPosts(accessToken.getEmail());
-        List<PostResponseDTO> results = new ArrayList<>();
-        for (Post post : postList) {
-            PostResponseDTO responseDTO = new PostResponseDTO(post);
-            long reactionCount = 0;
-            long commentCount = 0;
-            try {
-                reactionCount = getAllPostReation(post.getPostId()).size();
-                commentCount = getCommentsByPostId(post.getPostId()).size();
-                responseDTO.setReactsCount(reactionCount);
-                responseDTO.setCommentsCount(commentCount);
-            } catch (EmptyReactionException e) {
-                responseDTO.setReactsCount(0l);
-            } catch (EmptyCommentException e) {
-                responseDTO.setCommentsCount(0l);
+        User user;
+        List<Post> postList;
+        List<PostResponseDTO> results = new ArrayList<PostResponseDTO>();
+        try {
+            user = userDAO.getUserByEmail(accessToken.getEmail());
+            System.out.println("USER WITH ID: " + user.getUserId());
+            Set<Post> setPost = new HashSet<Post>();
+            setPost = user.getPosts();
+            System.out.println("POSTS SET LENGTH: " + setPost.size());
+            postList = new ArrayList<Post>(setPost);
+            System.out.println("POSTS LENGTH: " + postList.size());
+            logger.info("GET POSTS FROM USER: " + user.getLoginName());
+            for (Post post : postList) {
+                System.out.println("POST: " + post);
+                PostResponseDTO responseDTO = new PostResponseDTO(post);
+                responseDTO.setReactsCount(Long.valueOf(post.getReactedUser().size()));
+                responseDTO.setCommentsCount(Long.valueOf(post.getCommentUser().size()));
+                results.add(responseDTO);
             }
-            results.add(responseDTO);
+        } catch (UserNotFoundException e) {
         }
         return results;
     }
@@ -222,8 +235,14 @@ public class PostServiceImp implements PostService {
     }
 
     @Override
-    public List<User> getAllPostReation(Long id) throws EmptyReactionException {
-        return postDAO.getAllPostReation(id);
+    @TransactionAttribute(TransactionAttributeType.REQUIRED)
+    public List<User> getAllPostReation(Long id) throws EmptyEntityException, EmptyReactionException {
+        Set<User> users = postDAO.getPostById(id).getReactedUser();
+        if (users.size() == 0) {
+            throw new EmptyReactionException();
+        } else {
+            return new ArrayList<User>(users);
+        }
     }
 
     public List<Comment> getCommentsByPostId(Long postId) throws EmptyCommentException {
