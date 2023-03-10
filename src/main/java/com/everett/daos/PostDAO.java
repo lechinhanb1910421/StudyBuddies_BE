@@ -2,7 +2,6 @@ package com.everett.daos;
 
 import java.util.List;
 
-import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.TypedQuery;
@@ -13,8 +12,7 @@ import org.hibernate.search.jpa.FullTextQuery;
 import org.hibernate.search.jpa.Search;
 import org.hibernate.search.query.dsl.QueryBuilder;
 
-import com.everett.exceptions.EmptyEntityException;
-import com.everett.exceptions.EmptyReactionException;
+import com.everett.exceptions.checkedExceptions.EmptyEntityException;
 import com.everett.models.Post;
 import com.everett.models.User;
 
@@ -82,13 +80,12 @@ public class PostDAO {
         List<Post> resList = null;
         try {
             TypedQuery<Post> postQuery = entityManager.createQuery(
-                    "FROM Posts p JOIN FETCH p.user s WHERE s.email = :email ORDER BY p.postId", Post.class);
+                    "FROM Posts p WHERE p.user.email = :email ORDER BY p.postId", Post.class);
             resList = postQuery.setParameter("email", email).getResultList();
         } catch (Exception e) {
             e.printStackTrace();
         }
         return resList;
-
     }
 
     public void deletePost(Long id) {
@@ -127,19 +124,29 @@ public class PostDAO {
         }
     }
 
-    public List<User> getAllPostReation(Long id) throws EmptyReactionException {
-        List<User> res = null;
+    public Long getAllPostReactionsCount(Long id) {
+        Long res = null;
         try {
-            TypedQuery<User> query = entityManager
-                    .createQuery("SELECT r FROM Posts p JOIN p.reactions r WHERE p.postId = :postId", User.class);
-            res = query.setParameter("postId", id).getResultList();
+            TypedQuery<Long> query = entityManager
+                    .createQuery("SELECT COUNT(*) FROM Posts p JOIN p.reactions r WHERE p.postId = :postId",
+                            Long.class);
+            res = query.setParameter("postId", id).getSingleResult();
         } catch (Exception e) {
             e.printStackTrace();
         }
-        if (res == null) {
-            throw new EmptyReactionException();
-        } else {
-            return res;
+        return res;
+    }
+
+    public Long getAllPostCommentsCount(Long id) {
+        Long res = null;
+        try {
+            TypedQuery<Long> query = entityManager
+                    .createQuery("SELECT COUNT(*) FROM Posts p JOIN p.comments c WHERE p.postId = :postId",
+                            Long.class);
+            res = query.setParameter("postId", id).getSingleResult();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
+        return res;
     }
 }
