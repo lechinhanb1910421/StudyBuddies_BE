@@ -1,6 +1,7 @@
 package com.everett.apis;
 
 import javax.inject.Inject;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -15,13 +16,14 @@ import javax.ws.rs.core.SecurityContext;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import com.everett.exceptions.checkedExceptions.CommentNotFoundException;
+import com.everett.exceptions.webExceptions.CommentNotFoundWebException;
 import com.everett.models.Message;
 import com.everett.services.CommentService;
 
 @Path("/comments")
-// @Stateless(name = "CommentAPI")
 public class CommentAPI {
-    private static final Logger logger = LogManager.getLogger(PostAPI.class);
+    private static final Logger logger = LogManager.getLogger(CommentAPI.class);
 
     @Context
     SecurityContext securityContext;
@@ -58,4 +60,24 @@ public class CommentAPI {
             return Response.status(500).entity(message).build();
         }
     }
+
+    @Path("/{cmtId}")
+    @DELETE
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response removeComment(@PathParam("cmtId") Long cmtId) {
+        try {
+            commentService.deleteComment(cmtId);
+            logger.info("COMMENT ID: " + cmtId + " WAS REMOVED SUCCESSFULLY");
+            Message message = new Message("Comment was successfully removed");
+            return Response.ok(message).build();
+        } catch (CommentNotFoundException e) {
+            logger.error("COMMENT ID: " + cmtId + " NOT FOUND");
+            throw new CommentNotFoundWebException(cmtId);
+        } catch (Exception e) {
+            Message message = new Message("Something was wrong!");
+            e.printStackTrace();
+            return Response.status(500).entity(message).build();
+        }
+    }
+
 }
