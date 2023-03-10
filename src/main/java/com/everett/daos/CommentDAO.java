@@ -10,7 +10,6 @@ import javax.persistence.TypedQuery;
 import com.everett.exceptions.EmptyCommentException;
 import com.everett.models.Comment;
 
-@Stateless(name = "CommentDAO")
 public class CommentDAO {
     @PersistenceContext(unitName = "primary")
     EntityManager entityManager;

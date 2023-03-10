@@ -18,7 +18,6 @@ import com.everett.exceptions.EmptyReactionException;
 import com.everett.models.Post;
 import com.everett.models.User;
 
-@Stateless(name = "PostDAO")
 public class PostDAO {
     @PersistenceContext(unitName = "primary")
     EntityManager entityManager;

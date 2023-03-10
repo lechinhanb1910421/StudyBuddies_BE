@@ -6,6 +6,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.ejb.Stateless;
 import javax.inject.Inject;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
@@ -22,6 +23,7 @@ import com.everett.models.Message;
 import com.everett.models.Post;
 import com.everett.models.User;
 
+@Stateless
 public class CommentServiceImp implements CommentService {
 
     @Inject

@@ -7,7 +7,6 @@ import javax.persistence.PersistenceContext;
 import com.everett.exceptions.TopicNotFoundException;
 import com.everett.models.Topic;
 
-@Stateless(name = "TopicDAO")
 public class TopicDAO {
     @PersistenceContext(unitName = "primary")
     EntityManager entityManager;

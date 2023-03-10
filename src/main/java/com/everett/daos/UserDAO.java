@@ -11,7 +11,6 @@ import javax.persistence.TypedQuery;
 import com.everett.exceptions.UserNotFoundException;
 import com.everett.models.User;
 
-@Stateless(name = "UserDAO")
 public class UserDAO {
     @PersistenceContext(unitName = "primary")
     EntityManager entityManager;

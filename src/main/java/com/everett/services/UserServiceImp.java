@@ -5,6 +5,7 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 
+import javax.ejb.Stateless;
 import javax.inject.Inject;
 import javax.ws.rs.core.SecurityContext;
 
@@ -16,6 +17,7 @@ import com.everett.exceptions.UserNotFoundException;
 import com.everett.exceptions.UserPersistedException;
 import com.everett.models.User;
 
+@Stateless
 public class UserServiceImp implements UserService {
     @Inject
     UserDAO userDAO;
