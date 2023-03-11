@@ -1,5 +1,8 @@
 package com.everett.dtos;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.everett.models.Post;
 
 public class PostResponseDTO {
@@ -10,6 +13,7 @@ public class PostResponseDTO {
     private String majorName;
     private Long reactsCount;
     private Long commentsCount;
+    private List<String> picUrls = new ArrayList<String>();
 
     public PostResponseDTO() {
     }
@@ -91,6 +95,18 @@ public class PostResponseDTO {
 
     public void setCommentsCount(Long commentsCount) {
         this.commentsCount = commentsCount;
+    }
+
+    public List<String> getPicUrls() {
+        return picUrls;
+    }
+
+    public void setPicUrls(List<String> picUrls) {
+        this.picUrls = picUrls;
+    }
+
+    public void setPicUrls(String picUrls) {
+        this.picUrls.add(picUrls);
     }
 
 }
