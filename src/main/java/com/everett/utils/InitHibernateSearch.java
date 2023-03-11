@@ -27,8 +27,7 @@ public class InitHibernateSearch {
         FullTextEntityManager fullTextEntityManager = Search.getFullTextEntityManager(entityManager);
         try {
             fullTextEntityManager.createIndexer().startAndWait();
-            System.out.println("================Indexing successfully");
-            logger.info("================Indexing successfully");
+            logger.info("DATABASE INDEXING SUCCESSFULLY");
         } catch (InterruptedException e) {
             logger.error(e);
         }
