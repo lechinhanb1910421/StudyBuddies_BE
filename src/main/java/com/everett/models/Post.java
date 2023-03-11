@@ -26,6 +26,7 @@ import org.hibernate.search.annotations.Store;
 
 import com.everett.utils.TimestampDeserializer;
 import com.everett.utils.TimestampSerializer;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
@@ -71,6 +72,9 @@ public class Post {
 
     @OneToMany(mappedBy = "post", targetEntity = Comment.class, fetch = FetchType.LAZY, orphanRemoval = true, cascade = CascadeType.REMOVE)
     private Set<Comment> comments = new HashSet<Comment>();
+
+    @OneToMany(mappedBy = "post", targetEntity = Picture.class, fetch = FetchType.LAZY, orphanRemoval = true, cascade = CascadeType.REMOVE)
+    private Set<Picture> pictures = new HashSet<Picture>();
 
     public Post() {
     }
@@ -140,6 +144,7 @@ public class Post {
         this.user = user;
     }
 
+    @JsonIgnore
     public Set<User> getReactedUser() {
         return reactions;
     }
@@ -152,6 +157,7 @@ public class Post {
         this.reactions.remove(user);
     }
 
+    @JsonIgnore
     public Set<Comment> getCommentUser() {
         return comments;
     }
@@ -163,4 +169,14 @@ public class Post {
     public void unsetReactedUser(Comment comment) {
         this.comments.remove(comment);
     }
+
+    @JsonIgnore
+    public Set<Picture> getPictures() {
+        return pictures;
+    }
+
+    public void setPictures(Set<Picture> pictures) {
+        this.pictures = pictures;
+    }
+
 }
