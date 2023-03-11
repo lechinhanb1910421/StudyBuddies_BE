@@ -38,6 +38,7 @@ import com.everett.exceptions.webExceptions.MajorNotFoundWebException;
 import com.everett.exceptions.webExceptions.TopicNotFoundWebException;
 import com.everett.models.Comment;
 import com.everett.models.Major;
+import com.everett.models.Picture;
 import com.everett.models.Post;
 import com.everett.models.Topic;
 import com.everett.models.User;
@@ -108,6 +109,10 @@ public class PostServiceImp implements PostService {
         PostResponseDTO result = new PostResponseDTO(post);
         result.setReactsCount(postDAO.getAllPostReactionsCount(id));
         result.setCommentsCount(postDAO.getAllPostCommentsCount(id));
+        Set<Picture> pictures = post.getPictures();
+        pictures.forEach((pic) -> {
+            result.setPicUrls(pic.getPicUrl());
+        });
         return result;
     }
 
@@ -132,6 +137,10 @@ public class PostServiceImp implements PostService {
             PostResponseDTO responseDTO = new PostResponseDTO(post);
             responseDTO.setReactsCount(postDAO.getAllPostReactionsCount(post.getPostId()));
             responseDTO.setCommentsCount(postDAO.getAllPostCommentsCount(post.getPostId()));
+            Set<Picture> pictures = post.getPictures();
+            pictures.forEach((pic) -> {
+                responseDTO.setPicUrls(pic.getPicUrl());
+            });
             results.add(responseDTO);
         }
         return results;
@@ -173,7 +182,14 @@ public class PostServiceImp implements PostService {
         List<Post> postList = postDAO.seachPostsByKeywords(keywords);
         List<PostResponseDTO> results = new ArrayList<>();
         for (Post post : postList) {
-            results.add(new PostResponseDTO(post));
+            PostResponseDTO responseDTO = new PostResponseDTO(post);
+            responseDTO.setReactsCount(Long.valueOf(post.getReactedUser().size()));
+            responseDTO.setCommentsCount(Long.valueOf(post.getCommentUser().size()));
+            Set<Picture> pictures = post.getPictures();
+            pictures.forEach((pic) -> {
+                responseDTO.setPicUrls(pic.getPicUrl());
+            });
+            results.add(responseDTO);
         }
         return results;
     }
@@ -189,18 +205,19 @@ public class PostServiceImp implements PostService {
         List<PostResponseDTO> results = new ArrayList<PostResponseDTO>();
         try {
             user = userDAO.getUserByEmail(accessToken.getEmail());
-            System.out.println("USER WITH ID: " + user.getUserId());
             Set<Post> setPost = new HashSet<Post>();
             setPost = user.getPosts();
-            System.out.println("POSTS SET LENGTH: " + setPost.size());
             postList = new ArrayList<Post>(setPost);
-            System.out.println("POSTS LENGTH: " + postList.size());
             logger.info("GET POSTS FROM USER: " + user.getLoginName());
             for (Post post : postList) {
                 System.out.println("POST: " + post);
                 PostResponseDTO responseDTO = new PostResponseDTO(post);
                 responseDTO.setReactsCount(Long.valueOf(post.getReactedUser().size()));
                 responseDTO.setCommentsCount(Long.valueOf(post.getCommentUser().size()));
+                Set<Picture> pictures = post.getPictures();
+                pictures.forEach((pic) -> {
+                    responseDTO.setPicUrls(pic.getPicUrl());
+                });
                 results.add(responseDTO);
             }
         } catch (UserNotFoundException e) {
