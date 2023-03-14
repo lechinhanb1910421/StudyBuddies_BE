@@ -20,6 +20,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.everett.dtos.PostReceiveDTO;
+import com.everett.exceptions.checkedExceptions.EmptyCommentException;
 import com.everett.exceptions.checkedExceptions.EmptyEntityException;
 import com.everett.exceptions.checkedExceptions.EmptyReactionException;
 import com.everett.exceptions.checkedExceptions.UserNotFoundException;
@@ -109,7 +110,6 @@ public class PostAPI {
     public Response deletePost(@PathParam("id") Long id) {
         postService.deletePost(id);
         logger.info("POST " + id + " WAS DELETED SUCCESSFULLY");
-        System.out.println("Post " + id + " was deleted successfully");
         Message message = new Message("Post was deleted successfully");
         // isUpdated.set(true);
         return Response.ok(message).build();
@@ -137,7 +137,7 @@ public class PostAPI {
         }
     }
 
-    @Path("/{id}/react")
+    @Path("/{id}/reacts")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public Response getAllPostReation(@PathParam("id") Long id) {
@@ -147,6 +147,21 @@ public class PostAPI {
             Message message = new Message("This post has no reaction yet");
             return Response.ok(message).build();
         } catch (EmptyEntityException e2) {
+            Message message = new Message("Post with id: " + id + " not found");
+            throw new WebApplicationException(Response.status(400).entity(message).build());
+        }
+    }
+
+    @Path("/{id}/comments")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getAllPostComment(@PathParam("id") Long id) {
+        try {
+            return Response.ok(postService.getCommentsByPostId(id)).build();
+        } catch (EmptyCommentException e) {
+            Message message = new Message("This post has no comment yet");
+            return Response.ok(message).build();
+        } catch (EmptyEntityException e) {
             Message message = new Message("Post with id: " + id + " not found");
             throw new WebApplicationException(Response.status(400).entity(message).build());
         }
