@@ -41,12 +41,10 @@ public class Major {
     @OneToMany(mappedBy = "major", targetEntity = Post.class, fetch = FetchType.LAZY, orphanRemoval = true, cascade = CascadeType.REMOVE)
     private Set<Post> posts;
 
-
     public Major() {
     }
 
-    public Major(Long majorId, String majorName, String majorDescription, Long followers) {
-        this.majorId = majorId;
+    public Major(String majorName, String majorDescription, Long followers) {
         this.majorName = majorName;
         this.majorDescription = majorDescription;
         this.followers = followers;
