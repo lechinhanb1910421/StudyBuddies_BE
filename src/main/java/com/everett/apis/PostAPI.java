@@ -97,7 +97,6 @@ public class PostAPI {
             throw new WebApplicationException(Response.status(400).entity(message).build());
         }
         postService.updatePost(id, payload);
-        logger.info("Post with id: " + id + " was updated successfully");
         logger.info("POST WITH ID: " + id + " WAS UPDATED SUCCESSFULLY");
         Message message = new Message("Post was updated successfully");
         // isUpdated.set(true);
