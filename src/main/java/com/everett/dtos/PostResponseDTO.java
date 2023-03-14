@@ -1,13 +1,19 @@
 package com.everett.dtos;
 
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
 import com.everett.models.Post;
+import com.everett.utils.TimestampSerializer;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 public class PostResponseDTO {
     private Long postId;
     private Long userId;
+
+    @JsonSerialize(using = TimestampSerializer.class)
+    private Timestamp createdTime;
     private String content;
     private String topicName;
     private String majorName;
@@ -18,10 +24,12 @@ public class PostResponseDTO {
     public PostResponseDTO() {
     }
 
-    public PostResponseDTO(Long postId, Long userId, String content, String topicName, String majorName,
+    public PostResponseDTO(Long postId, Long userId, Timestamp createdTime, String content, String topicName,
+            String majorName,
             Long reactsCount, Long commentsCount) {
         this.postId = postId;
         this.userId = userId;
+        this.createdTime = createdTime;
         this.content = content;
         this.topicName = topicName;
         this.majorName = majorName;
@@ -32,6 +40,7 @@ public class PostResponseDTO {
     public PostResponseDTO(Post post) {
         this.postId = post.getPostId();
         this.userId = post.getOwnerUser().getUserId();
+        this.createdTime = post.getCreatedTime();
         this.content = post.getContent();
         this.topicName = post.getTopic().getTopicName();
         this.majorName = post.getMajor().getMajorName();
@@ -109,4 +118,11 @@ public class PostResponseDTO {
         this.picUrls.add(picUrls);
     }
 
+    public Timestamp getCreatedTime() {
+        return createdTime;
+    }
+
+    public void setCreatedTime(Timestamp createdTime) {
+        this.createdTime = createdTime;
+    }
 }
