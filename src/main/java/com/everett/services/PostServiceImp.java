@@ -24,6 +24,7 @@ import com.everett.daos.MajorDAO;
 import com.everett.daos.PostDAO;
 import com.everett.daos.TopicDAO;
 import com.everett.daos.UserDAO;
+import com.everett.dtos.CommentResponseDTO;
 import com.everett.dtos.PostReceiveDTO;
 import com.everett.dtos.PostResponseDTO;
 import com.everett.exceptions.checkedExceptions.EmptyCommentException;
@@ -210,7 +211,6 @@ public class PostServiceImp implements PostService {
             postList = new ArrayList<Post>(setPost);
             logger.info("GET POSTS FROM USER: " + user.getLoginName());
             for (Post post : postList) {
-                System.out.println("POST: " + post);
                 PostResponseDTO responseDTO = new PostResponseDTO(post);
                 responseDTO.setReactsCount(Long.valueOf(post.getReactedUser().size()));
                 responseDTO.setCommentsCount(Long.valueOf(post.getCommentUser().size()));
@@ -262,8 +262,20 @@ public class PostServiceImp implements PostService {
         }
     }
 
-    public List<Comment> getCommentsByPostId(Long postId) throws EmptyCommentException {
-        return commentDAO.getCommentsByPostId(postId);
+    @Override
+    @TransactionAttribute(TransactionAttributeType.REQUIRED)
+    public List<CommentResponseDTO> getCommentsByPostId(Long postId)
+            throws EmptyCommentException, EmptyEntityException {
+        Post post = postDAO.getPostById(postId);
+        Set<Comment> comments = new HashSet<Comment>(post.getCommentUser());
+        if (comments.size() == 0) {
+            throw new EmptyCommentException();
+        }
+        List<CommentResponseDTO> results = new ArrayList<CommentResponseDTO>();
+        comments.forEach((elem) -> {
+            results.add(new CommentResponseDTO(elem));
+        });
+        return results;
 
     }
 
