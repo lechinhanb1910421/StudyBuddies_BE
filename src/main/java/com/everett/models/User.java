@@ -18,11 +18,13 @@ import javax.persistence.Table;
 import com.everett.utils.TimestampDeserializer;
 import com.everett.utils.TimestampSerializer;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 @Entity(name = "Users")
 @Table(name = "Users", schema = "PUBLIC")
+@JsonIgnoreProperties({ "hibernateLazyInitializer", "handler" })
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -68,7 +70,6 @@ public class User {
         this.familyName = familyName;
         this.email = email;
         this.createdDate = createdDate;
-        // this.userRole = userRole;
         this.accountStatus = accountStatus;
     }
 
@@ -130,8 +131,9 @@ public class User {
 
     @Override
     public String toString() {
-        return "[User: " + userId + ", email: " + email + ", userName: " + givenName + " " + familyName
-                + ", loginName: " + loginName + "]";
+        return "User [userId=" + userId + ", loginName=" + loginName + ", givenName=" + givenName + ", familyName="
+                + familyName + ", email=" + email + ", createdDate=" + createdDate + ", accountStatus=" + accountStatus
+                + ", posts=" + posts + ", reactions=" + reactions + ", comments=" + comments + "]";
     }
 
     @JsonIgnore
