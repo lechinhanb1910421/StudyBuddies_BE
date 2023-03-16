@@ -38,7 +38,7 @@
         <extension module="org.wildfly.extension.request-controller" />
         <extension module="org.wildfly.extension.security.manager" />
         <extension module="org.wildfly.extension.undertow" />
-        <extension module="org.keycloak.keycloak-adapter-subsystem"/>
+        <!-- <extension module="org.keycloak.keycloak-adapter-subsystem"/> -->
     </extensions>
     <management>
         <security-realms>
@@ -545,7 +545,7 @@
             <client-config name="Standard-Client-Config" />
         </subsystem>
         <subsystem xmlns="urn:jboss:domain:weld:4.0" />
-        <subsystem xmlns="urn:jboss:domain:keycloak:1.1">
+        <!-- <subsystem xmlns="urn:jboss:domain:keycloak:1.1">
             <secure-deployment name="nlcntt.war">
                 <realm>${env.KEYCLOAK_REALM}</realm>
                 <auth-server-url>${env.KEYCLOAK_AUTH_SERVER}</auth-server-url>
@@ -553,7 +553,7 @@
                 <public-client>true</public-client>
                 <resource>${env.KEYCLOAK_CLIENT}</resource>
             </secure-deployment>
-        </subsystem>
+        </subsystem> -->
     </profile>
     <interfaces>
         <interface name="management">

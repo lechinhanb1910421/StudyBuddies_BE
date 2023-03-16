@@ -124,24 +124,43 @@ limitations under the License.
 
     <dependencies>
         <dependency>
+            <groupId>org.eclipse.microprofile</groupId>
+            <artifactId>microprofile</artifactId>
+            <version>2.0.1</version>
+            <type>pom</type>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.microprofile.jwt</groupId>
+            <artifactId>microprofile-jwt-auth-api</artifactId>
+            <version>1.1</version>
+            <scope>provided</scope>
+        </dependency>
+         <dependency>
+            <groupId>com.google.firebase</groupId>
+            <artifactId>firebase-admin</artifactId>
+            <version>8.1.0</version>
+        </dependency>
+
+        <!-- <dependency>
             <groupId>org.keycloak</groupId>
             <artifactId>keycloak-core</artifactId>
             <version>20.0.3</version>
             <scope>provided</scope>
-        </dependency>
+        </dependency> -->
         <!-- https://mvnrepository.com/artifact/org.keycloak/keycloak-adapter-core -->
-        <dependency>
+        <!-- <dependency>
             <groupId>org.keycloak</groupId>
             <artifactId>keycloak-adapter-core</artifactId>
             <version>20.0.3</version>
             <scope>provided</scope>
-        </dependency>
-        <dependency>
+        </dependency> -->
+        <!-- <dependency>
             <groupId>org.keycloak</groupId>
             <artifactId>keycloak-adapter-spi</artifactId>
             <version>20.0.3</version>
             <scope>provided</scope>
-        </dependency>
+        </dependency> -->
 
         <!-- Dependency for Hibernate  search -->
         <dependency>

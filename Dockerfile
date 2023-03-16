@@ -12,14 +12,7 @@ COPY standalone.xml $JBOSS_HOME/standalone/configuration/
 COPY src/main/resources/log4j2.xml $JBOSS_HOME/standalone/configuration/
 COPY postgresql-42.5.0.jar $JBOSS_HOME/modules/system/layers/base/org/postgresql/main/
 
-ADD keycloak-oidc-wildfly-adapter-20.0.3.zip $JBOSS_HOME/keycloak/
 
-RUN unzip $JBOSS_HOME/keycloak/keycloak-oidc-wildfly-adapter-20.0.3.zip -d $JBOSS_HOME/keycloak
-
-RUN cp -R $JBOSS_HOME/keycloak/bin/* $JBOSS_HOME/bin/
-RUN cp -R $JBOSS_HOME/keycloak/modules/* $JBOSS_HOME/modules/
-
-RUN $JBOSS_HOME/bin/jboss-cli.sh --file=$JBOSS_HOME/bin/adapter-elytron-install-offline.cli
 RUN rm -rf $JBOSS_HOME/standalone/configuration/standalone_xml_history/ $JBOSS_HOME/standalone/log/*
 
 # Expose the ports in which we're interested
