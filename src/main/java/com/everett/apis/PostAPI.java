@@ -1,5 +1,6 @@
 package com.everett.apis;
 
+import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
@@ -11,13 +12,13 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.SecurityContext;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.eclipse.microprofile.jwt.Claim;
+import org.eclipse.microprofile.jwt.JsonWebToken;
 
 import com.everett.dtos.PostReceiveDTO;
 import com.everett.exceptions.checkedExceptions.EmptyCommentException;
@@ -29,14 +30,31 @@ import com.everett.models.Message;
 import com.everett.services.PostService;
 
 @Path("/posts")
+@RequestScoped
 public class PostAPI {
     private static final Logger logger = LogManager.getLogger(PostAPI.class);
 
     @Inject
     PostService postService;
 
-    @Context
-    SecurityContext securityContext;
+    @Inject
+    JsonWebToken jwt;
+
+    @Inject
+    @Claim("given_name")
+    private String givenName;
+
+    @Inject
+    @Claim("family_name")
+    private String familyName;
+
+    @Inject
+    @Claim("email")
+    private String email;
+
+    @Inject
+    @Claim("preferred_username")
+    private String loginName;
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
@@ -67,7 +85,7 @@ public class PostAPI {
             throw new WebApplicationException(Response.status(400).entity(errMsg).build());
         }
         try {
-            postService.createPost(payload, securityContext);
+            postService.createPost(payload, email);
         } catch (UserNotFoundException e) {
             Message message = new Message("User not found");
             throw new WebApplicationException(Response.status(400).entity(message).build());
@@ -118,8 +136,8 @@ public class PostAPI {
     @POST
     @Produces(MediaType.APPLICATION_JSON)
     public Response reactPost(@PathParam("id") Long id) {
-        Message message = new Message("Post was reacted successfully");
-        postService.reactPost(id, securityContext);
+        Message message = new Message("Post was reacted successfully by user: " + email);
+        postService.reactPost(id, email);
         return Response.ok(message).build();
     }
 
@@ -128,7 +146,7 @@ public class PostAPI {
     @Produces(MediaType.APPLICATION_JSON)
     public Response removeReactPost(@PathParam("id") Long id) {
         try {
-            postService.removeReactPost(id, securityContext);
+            postService.removeReactPost(id, email);
             return Response.ok().build();
         } catch (Exception e) {
             Message message = new Message("Can not unset reaction");

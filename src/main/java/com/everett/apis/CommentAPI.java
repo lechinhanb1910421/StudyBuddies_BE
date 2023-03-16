@@ -15,6 +15,8 @@ import javax.ws.rs.core.SecurityContext;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.eclipse.microprofile.jwt.Claim;
+import org.eclipse.microprofile.jwt.JsonWebToken;
 
 import com.everett.exceptions.checkedExceptions.CommentNotFoundException;
 import com.everett.exceptions.webExceptions.CommentNotFoundWebException;
@@ -30,6 +32,12 @@ public class CommentAPI {
 
     @Inject
     CommentService commentService;
+    @Inject
+    JsonWebToken jwt;
+
+    @Inject
+    @Claim("email")
+    private String email;
 
     @GET
     @Path("/")
@@ -49,9 +57,8 @@ public class CommentAPI {
     @Produces(MediaType.APPLICATION_JSON)
     public Response addComment(@PathParam("postId") Long postId, @QueryParam("content") String content) {
         try {
-            commentService.addComment(postId, content, securityContext);
-            logger.info("Comment" + postId + ", content: " + content + " was successfully added");
-            System.out.println("Comment" + postId + ", content: " + content + " was successfully added");
+            commentService.addComment(postId, content, email);
+            logger.info("COMMENT" + postId + ", CONTENT: " + content + " WAS SUCCESSFULLY ADDED");
             Message message = new Message("Comment was successfully added");
             return Response.ok(message).build();
         } catch (Exception e) {
