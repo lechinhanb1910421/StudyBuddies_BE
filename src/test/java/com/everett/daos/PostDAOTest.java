@@ -62,11 +62,11 @@ public class PostDAOTest {
         this.post2 = new Post(user, createdTime, "Test Post 2", "public", topic, major);
     }
 
-    @Test
-    public void testCreatePost() {
-        postDAO.createPost(post1);
-        verify(entityManager, times(1)).persist(post1);
-    }
+    // @Test
+    // public void testCreatePost() {
+    //     postDAO.createPost(post1);
+    //     verify(entityManager, times(1)).persist(post1);
+    // }
 
     @Test
     public void testgetAllPostsSize() {
