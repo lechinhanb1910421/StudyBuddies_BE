@@ -44,7 +44,8 @@ public class PictureServiceImp implements PictureService {
     @TransactionAttribute(TransactionAttributeType.REQUIRED)
     public void addPostPicture(Long postId, String picUrl) throws EmptyEntityException {
         Post post = postDAO.getPostById(postId);
-        Picture picture = new Picture(post, picUrl);
+        Picture picture = new Picture(picUrl);
+        picture.setPost(post);
         pictureDAO.addPicture(picture);
     }
 
