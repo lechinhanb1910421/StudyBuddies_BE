@@ -2,8 +2,6 @@ package com.everett.services;
 
 import java.util.List;
 
-import javax.ws.rs.core.SecurityContext;
-
 import com.everett.dtos.CommentResponseDTO;
 import com.everett.dtos.PostReceiveDTO;
 import com.everett.dtos.PostResponseDTO;
@@ -16,7 +14,7 @@ import com.everett.models.User;
 
 public interface PostService {
 
-    public void createPost(PostReceiveDTO payload, SecurityContext securityContext) throws UserNotFoundException;
+    public void createPost(PostReceiveDTO payload, String email) throws UserNotFoundException;
 
     public PostResponseDTO getPostResponseById(Long id);
 
@@ -24,7 +22,7 @@ public interface PostService {
 
     public List<PostResponseDTO> getAllPosts();
 
-    public List<PostResponseDTO> getAllUserPosts(SecurityContext securityContext);
+    public List<PostResponseDTO> getAllUserPosts(String email);
 
     public void deletePost(Long id);
 
@@ -32,9 +30,9 @@ public interface PostService {
 
     public List<PostResponseDTO> seachPostsByKeywords(String keywords);
 
-    public void reactPost(Long id, SecurityContext securityContext);
+    public void reactPost(Long id, String email);
 
-    public void removeReactPost(Long id, SecurityContext securityContext);
+    public void removeReactPost(Long id, String email);
 
     public List<User> getAllPostReation(Long id) throws EmptyReactionException, EmptyEntityException;
 

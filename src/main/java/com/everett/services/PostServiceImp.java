@@ -12,12 +12,9 @@ import javax.ejb.Stateless;
 import javax.ejb.TransactionAttribute;
 import javax.ejb.TransactionAttributeType;
 import javax.inject.Inject;
-import javax.ws.rs.core.SecurityContext;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.keycloak.KeycloakPrincipal;
-import org.keycloak.representations.AccessToken;
 
 import com.everett.daos.CommentDAO;
 import com.everett.daos.MajorDAO;
@@ -66,8 +63,7 @@ public class PostServiceImp implements PostService {
     UserService userService;
 
     @Override
-    @SuppressWarnings("rawtypes")
-    public void createPost(PostReceiveDTO payload, SecurityContext securityContext) throws UserNotFoundException {
+    public void createPost(PostReceiveDTO payload, String email) throws UserNotFoundException {
         Timestamp createdTime = Timestamp.from(Instant.now().truncatedTo(ChronoUnit.SECONDS));
         Long topicId = payload.getTopicId();
         Long majorId = payload.getMajorId();
@@ -91,11 +87,12 @@ public class PostServiceImp implements PostService {
                 throw new MajorNotFoundWebException(majorId);
             }
         }
-        KeycloakPrincipal principal = (KeycloakPrincipal) securityContext.getUserPrincipal();
-        AccessToken accessToken = principal.getKeycloakSecurityContext().getToken();
-        User user = userService.getUserByEmail(accessToken.getEmail());
+        User user = userService.getUserByEmail(email);
         logger.info("CREATING POST FOR USER: " + user.getLoginName());
-        Post newPost = new Post(user, createdTime, payload.getContent(), payload.getAudienceMode(), topic, major);
+        Post newPost = new Post(user, createdTime, payload.getContent(),
+                payload.getAudienceMode(), topic, major);
+        Picture picture = new Picture(payload.getImageUrl());
+        newPost.setPicture(picture);
         try {
             postDAO.createPost(newPost);
         } catch (Exception ex) {
@@ -196,16 +193,13 @@ public class PostServiceImp implements PostService {
     }
 
     @Override
-    @SuppressWarnings("rawtypes")
     @TransactionAttribute(TransactionAttributeType.REQUIRED)
-    public List<PostResponseDTO> getAllUserPosts(SecurityContext securityContext) {
-        KeycloakPrincipal principal = (KeycloakPrincipal) securityContext.getUserPrincipal();
-        AccessToken accessToken = principal.getKeycloakSecurityContext().getToken();
+    public List<PostResponseDTO> getAllUserPosts(String email) {
         User user;
         List<Post> postList;
         List<PostResponseDTO> results = new ArrayList<PostResponseDTO>();
         try {
-            user = userDAO.getUserByEmail(accessToken.getEmail());
+            user = userDAO.getUserByEmail(email);
             Set<Post> setPost = new HashSet<Post>();
             setPost = user.getPosts();
             postList = new ArrayList<Post>(setPost);
@@ -226,11 +220,7 @@ public class PostServiceImp implements PostService {
     }
 
     @Override
-    @SuppressWarnings("rawtypes")
-    public void reactPost(Long id, SecurityContext securityContext) {
-        KeycloakPrincipal principal = (KeycloakPrincipal) securityContext.getUserPrincipal();
-        AccessToken accessToken = principal.getKeycloakSecurityContext().getToken();
-        String email = accessToken.getEmail();
+    public void reactPost(Long id, String email) {
         try {
             User user = userService.getUserByEmail(email);
             postDAO.reactPost(id, user);
@@ -239,11 +229,7 @@ public class PostServiceImp implements PostService {
     }
 
     @Override
-    @SuppressWarnings("rawtypes")
-    public void removeReactPost(Long id, SecurityContext securityContext) {
-        KeycloakPrincipal principal = (KeycloakPrincipal) securityContext.getUserPrincipal();
-        AccessToken accessToken = principal.getKeycloakSecurityContext().getToken();
-        String email = accessToken.getEmail();
+    public void removeReactPost(Long id, String email) {
         try {
             User user = userService.getUserByEmail(email);
             postDAO.removeReactPost(id, user);
@@ -256,8 +242,13 @@ public class PostServiceImp implements PostService {
     public List<User> getAllPostReation(Long id) throws EmptyEntityException, EmptyReactionException {
         Set<User> users = postDAO.getPostById(id).getReactedUser();
         if (users.size() == 0) {
+            System.out.println("REACTED USER NULL");
             throw new EmptyReactionException();
         } else {
+            System.out.println("REACTED USER NOT NULL");
+            for (User user : users) {
+                System.out.println(user);
+            }
             return new ArrayList<User>(users);
         }
     }

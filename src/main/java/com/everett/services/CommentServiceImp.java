@@ -10,10 +10,6 @@ import javax.ejb.Stateless;
 import javax.inject.Inject;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.SecurityContext;
-
-import org.keycloak.KeycloakPrincipal;
-import org.keycloak.representations.AccessToken;
 
 import com.everett.daos.CommentDAO;
 import com.everett.dtos.CommentResponseDTO;
@@ -37,19 +33,17 @@ public class CommentServiceImp implements CommentService {
     CommentDAO commentDAO;
 
     @Override
-    @SuppressWarnings("rawtypes")
-    public void addComment(Long postId, String content, SecurityContext context) {
+    public void addComment(Long postId, String content, String email) {
         try {
             Post post = postService.getPostById(postId);
-            KeycloakPrincipal principal = (KeycloakPrincipal) context.getUserPrincipal();
-            AccessToken accessToken = principal.getKeycloakSecurityContext().getToken();
-            User user = userService.getUserByEmail(accessToken.getEmail());
-
+            User user = userService.getUserByEmail(email);
             Timestamp createdTime = Timestamp.from(Instant.now().truncatedTo(ChronoUnit.SECONDS));
 
             Comment comment = new Comment(post, user, createdTime, content);
             commentDAO.addComment(comment);
-        } catch (UserNotFoundException e) {
+        } catch (
+
+        UserNotFoundException e) {
             Message msg = new Message("User with id does not exist");
             throw new WebApplicationException(Response.status(400).entity(msg).build());
         }
