@@ -7,15 +7,17 @@ public class PostReceiveDTO {
     private String audienceMode;
     private Long topicId;
     private Long majorId;
+    private String imageUrl;
 
     public PostReceiveDTO() {
     }
 
-    public PostReceiveDTO(String content, String audienceMode, Long topicId, Long majorId) {
+    public PostReceiveDTO(String content, String audienceMode, Long topicId, Long majorId, String imageUrl) {
         this.content = content;
         this.audienceMode = audienceMode;
         this.topicId = topicId;
         this.majorId = majorId;
+        this.imageUrl = imageUrl;
     }
 
     public String getContent() {
@@ -48,6 +50,14 @@ public class PostReceiveDTO {
 
     public void setMajorId(Long majorId) {
         this.majorId = majorId;
+    }
+
+    public String getImageUrl() {
+        return imageUrl;
+    }
+
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
     }
 
     @JsonIgnore
