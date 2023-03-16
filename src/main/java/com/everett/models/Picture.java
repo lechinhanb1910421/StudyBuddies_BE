@@ -19,7 +19,7 @@ public class Picture {
     private Long picId;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "postId", nullable = false)
+    @JoinColumn(name = "postId")
     private Post post;
 
     @Column(name = "picUrl", nullable = false)
@@ -28,8 +28,7 @@ public class Picture {
     public Picture() {
     }
 
-    public Picture(Post post, String picUrl) {
-        this.post = post;
+    public Picture(String picUrl) {
         this.picUrl = picUrl;
     }
 

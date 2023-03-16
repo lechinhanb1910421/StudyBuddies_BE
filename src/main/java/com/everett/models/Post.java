@@ -73,7 +73,7 @@ public class Post {
     @OneToMany(mappedBy = "post", targetEntity = Comment.class, fetch = FetchType.LAZY, orphanRemoval = true, cascade = CascadeType.REMOVE)
     private Set<Comment> comments = new HashSet<Comment>();
 
-    @OneToMany(mappedBy = "post", targetEntity = Picture.class, fetch = FetchType.LAZY, orphanRemoval = true, cascade = CascadeType.REMOVE)
+    @OneToMany(mappedBy = "post", targetEntity = Picture.class, orphanRemoval = true, cascade = CascadeType.ALL)
     private Set<Picture> pictures = new HashSet<Picture>();
 
     public Post() {
@@ -175,8 +175,17 @@ public class Post {
         return pictures;
     }
 
-    public void setPictures(Set<Picture> pictures) {
+    public void setPicturesSet(Set<Picture> pictures) {
         this.pictures = pictures;
+    }
+
+    public void setPicture(Picture picture) {
+        this.pictures.add(picture);
+        picture.setPost(this);
+    }
+    public void unsetPicture(Picture picture) {
+        this.pictures.remove(picture);
+        picture.setPost(null);
     }
 
 }
