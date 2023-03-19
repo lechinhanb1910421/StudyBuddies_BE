@@ -1,9 +1,10 @@
 package com.everett.dtos;
 
 import java.sql.Timestamp;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
+import com.everett.models.Avatar;
 import com.everett.models.User;
 import com.everett.utils.TimestampSerializer;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
@@ -19,7 +20,7 @@ public class UserResponseDTO {
     @JsonSerialize(using = TimestampSerializer.class)
     private Timestamp createdDate;
     private String accountStatus;
-    private Set<String> avatars = new HashSet<String>();
+    private List<Avatar> avatars = new ArrayList<Avatar>();
 
     public UserResponseDTO() {
     }
@@ -99,16 +100,12 @@ public class UserResponseDTO {
         this.accountStatus = accountStatus;
     }
 
-    public Set<String> getAvatars() {
+    public List<Avatar> getAvatars() {
         return avatars;
     }
 
-    public void setAvatars(Set<String> avatars) {
+    public void setAvatars(List<Avatar> avatars) {
         this.avatars = avatars;
-    }
-
-    public void setSingleAvatar(String avatarUrl) {
-        this.avatars.add(avatarUrl);
     }
 
 }
