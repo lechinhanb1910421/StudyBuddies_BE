@@ -54,6 +54,14 @@ public class UserServiceImp implements UserService {
     }
 
     @Override
+    public UserResponseDTO getUserResByEmail(String email) throws UserNotFoundException {
+        User user = userDAO.getUserByEmail(email);
+        UserResponseDTO userResponse = new UserResponseDTO(user);
+        userResponse.setAvatars(new ArrayList<Avatar>(user.getAvatars()));
+        return userResponse;
+    }
+
+    @Override
     @TransactionAttribute(TransactionAttributeType.REQUIRED)
     public UserResponseDTO getUserById(Long userId) throws UserNotFoundException {
         User user = userDAO.getUserById(userId);

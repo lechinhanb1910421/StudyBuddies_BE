@@ -10,7 +10,6 @@ import com.everett.models.Avatar;
 import com.everett.models.User;
 
 public interface UserService {
-
     public void persistContextUser(User user) throws UserPersistedException;
 
     public List<UserResponseDTO> getAllUsers();
@@ -18,6 +17,8 @@ public interface UserService {
     public UserResponseDTO getUserById(Long userId) throws UserNotFoundException;
 
     public User getUserByEmail(String email) throws UserNotFoundException;
+
+    public UserResponseDTO getUserResByEmail(String email) throws UserNotFoundException;
 
     public void addUserAvatar(String userEmail, Avatar avatar) throws UserNotFoundException;
 
