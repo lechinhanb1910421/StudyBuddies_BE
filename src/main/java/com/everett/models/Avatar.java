@@ -36,7 +36,7 @@ public class Avatar {
 
     @Override
     public String toString() {
-        return "Avatar [avaId=" + avaId + ", user=" + user + ", avaUrl=" + avaUrl + "]";
+        return "Avatar [avaId=" + avaId + ", avaUrl=" + avaUrl + "]";
     }
 
     public Long getAvaId() {

@@ -1,7 +1,6 @@
 package com.everett.services;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
 import java.sql.Timestamp;
@@ -19,7 +18,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.everett.daos.PostDAO;
 import com.everett.exceptions.checkedExceptions.EmptyEntityException;
-import com.everett.exceptions.webExceptions.IdNotFoundException;
 import com.everett.models.Major;
 import com.everett.models.Post;
 import com.everett.models.Topic;
@@ -35,7 +33,7 @@ public class PostServiceImpTest {
     PostDAO postDAO;
 
     private Post post1;
-    private Post post2;
+    // private Post post2;
 
     private Topic topic;
     private Major major;
@@ -48,7 +46,7 @@ public class PostServiceImpTest {
         Timestamp createdTime = Timestamp.from(Instant.now().truncatedTo(ChronoUnit.SECONDS));
         this.user = new User("B1910421", "Nhan", "Le", "test@mail.com", createdTime, "active");
         this.post1 = new Post(user, createdTime, "Test Post 1", "public", topic, major);
-        this.post2 = new Post(user, createdTime, "Test Post 2", "public", topic, major);
+        // this.post2 = new Post(user, createdTime, "Test Post 2", "public", topic, major);
     }
 
     @Test
@@ -60,18 +58,18 @@ public class PostServiceImpTest {
     }
 
     // @Test
-    // public void testGetPostByIdNotFound() throws EmptyEntityException {
-    //     assertThrows(IdNotFoundException.class, () -> {
-    //         postService.getPostById(-1L);
-    //     });
+    // public void testGetPostByIdNotFound() {
+    // assertThrows(IdNotFoundException.class, () -> {
+    // postService.getPostById(-1L);
+    // });
     // }
 
     // @Test
     // public void testGetPostByIdNotFound2() throws EmptyEntityException {
-    //     Long id = 1L;
-    //     when(postDAO.getPostById(id)).thenThrow(EmptyEntityException.class);
-    //     assertThrows(IdNotFoundException.class, () -> {
-    //         postService.getPostById(id);
-    //     });
+    // Long id = 1L;
+    // when(postDAO.getPostById(id)).thenThrow(EmptyEntityException.class);
+    // assertThrows(IdNotFoundException.class, () -> {
+    // postService.getPostById(id);
+    // });
     // }
 }
