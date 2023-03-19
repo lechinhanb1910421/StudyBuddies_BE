@@ -2,13 +2,16 @@ package com.everett.services;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 import javax.ejb.Stateless;
+import javax.ejb.TransactionAttribute;
+import javax.ejb.TransactionAttributeType;
 import javax.inject.Inject;
 
+import com.everett.daos.AvatarDAO;
 import com.everett.daos.UserDAO;
 import com.everett.dtos.UserResponseDTO;
+import com.everett.exceptions.checkedExceptions.AvatarNotFoundException;
 import com.everett.exceptions.checkedExceptions.UserNotFoundException;
 import com.everett.exceptions.checkedExceptions.UserPersistedException;
 import com.everett.models.Avatar;
@@ -18,6 +21,9 @@ import com.everett.models.User;
 public class UserServiceImp implements UserService {
     @Inject
     UserDAO userDAO;
+
+    @Inject
+    AvatarDAO avatarDAO;
 
     @Override
     public void persistContextUser(User user) throws UserPersistedException {
@@ -30,15 +36,13 @@ public class UserServiceImp implements UserService {
     }
 
     @Override
+    @TransactionAttribute(TransactionAttributeType.REQUIRED)
     public List<UserResponseDTO> getAllUsers() {
         List<User> users = userDAO.getAllUsers();
         List<UserResponseDTO> results = new ArrayList<UserResponseDTO>();
         users.forEach(user -> {
             UserResponseDTO userRes = new UserResponseDTO(user);
-            Set<Avatar> avatarSet = user.getAvatars();
-            avatarSet.forEach(avatar -> {
-                userRes.setSingleAvatar(avatar.getAvaUrl());
-            });
+            userRes.setAvatars(avatarDAO.getAllAvatarsByUserId(user.getUserId()));
             results.add(userRes);
         });
         return results;
@@ -50,13 +54,11 @@ public class UserServiceImp implements UserService {
     }
 
     @Override
+    @TransactionAttribute(TransactionAttributeType.REQUIRED)
     public UserResponseDTO getUserById(Long userId) throws UserNotFoundException {
         User user = userDAO.getUserById(userId);
         UserResponseDTO userRes = new UserResponseDTO(user);
-        Set<Avatar> avatarSet = user.getAvatars();
-        avatarSet.forEach(avatar -> {
-            userRes.setSingleAvatar(avatar.getAvaUrl());
-        });
+        userRes.setAvatars(avatarDAO.getAllAvatarsByUserId(userId));
         return userRes;
     }
 
@@ -68,18 +70,7 @@ public class UserServiceImp implements UserService {
     }
 
     @Override
-    public void removeUserAvatar(String userEmail, String avatarUrl) throws UserNotFoundException {
-        User user = userDAO.getUserByEmail(userEmail);
-        Set<Avatar> avatarSet = user.getAvatars();
-        avatarSet.forEach((elem) -> {
-            if (elem.getAvaUrl() == avatarUrl) {
-                System.out.println("FOUND AVATAR " + avatarUrl);
-                elem.setUser(null);
-                // avatarSet.remove(elem);
-                user.unsetAvatar(elem);
-            }
-        });
-        user.setAvatarsSet(avatarSet);
-        userDAO.updateUser(user);
+    public void removeAvatarById(Long avaId) throws AvatarNotFoundException {
+        avatarDAO.removeAvatarById(avaId);
     }
 }

@@ -3,6 +3,7 @@ package com.everett.services;
 import java.util.List;
 
 import com.everett.dtos.UserResponseDTO;
+import com.everett.exceptions.checkedExceptions.AvatarNotFoundException;
 import com.everett.exceptions.checkedExceptions.UserNotFoundException;
 import com.everett.exceptions.checkedExceptions.UserPersistedException;
 import com.everett.models.Avatar;
@@ -20,5 +21,5 @@ public interface UserService {
 
     public void addUserAvatar(String userEmail, Avatar avatar) throws UserNotFoundException;
 
-    public void removeUserAvatar(String userEmail, String avatarUrl) throws UserNotFoundException;
+    public void removeAvatarById(Long avaId) throws AvatarNotFoundException;
 }
