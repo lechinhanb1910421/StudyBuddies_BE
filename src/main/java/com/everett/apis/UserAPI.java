@@ -72,9 +72,13 @@ public class UserAPI {
     @Produces(MediaType.APPLICATION_JSON)
     @PermitAll
     public Response getUserFromContext() {
-        Timestamp createdTime = Timestamp.from(Instant.now().truncatedTo(ChronoUnit.SECONDS));
-        User user = new User(loginName, givenName, familyName, email, createdTime, "active");
-        return Response.ok(user).build();
+        try {
+            System.out.println("GET USER WITH MAIL: " + email);
+            return Response.ok(userService.getUserResByEmail(email)).build();
+        } catch (UserNotFoundException e) {
+            Message message = new Message("User with email " + email + " not found");
+            throw new WebApplicationException(Response.status(400).entity(message).build());
+        }
     }
 
     @Path("/")
