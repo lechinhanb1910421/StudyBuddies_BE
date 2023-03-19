@@ -51,6 +51,9 @@ public class User {
     @Column(name = "accountStatus", nullable = false)
     private String accountStatus;
 
+    @OneToMany(mappedBy = "user", targetEntity = Avatar.class, orphanRemoval = true, cascade = CascadeType.ALL)
+    private Set<Avatar> avatars = new HashSet<Avatar>();
+
     @OneToMany(mappedBy = "user", targetEntity = Post.class, fetch = FetchType.LAZY, orphanRemoval = true, cascade = CascadeType.REMOVE)
     private Set<Post> posts = new HashSet<Post>();
 
@@ -162,4 +165,23 @@ public class User {
     public void setPosts(Set<Post> posts) {
         this.posts = posts;
     }
+
+    public void setAvatar(Avatar avatar) {
+        this.avatars.add(avatar);
+        avatar.setUser(this);
+    }
+
+    public void unsetAvatar(Avatar avatar) {
+        this.avatars.remove(avatar);
+        avatar.setUser(null);
+    }
+
+    public Set<Avatar> getAvatars() {
+        return avatars;
+    }
+
+    public void setAvatarsSet(Set<Avatar> avatars) {
+        this.avatars = avatars;
+    }
+
 }
