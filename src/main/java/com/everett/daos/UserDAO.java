@@ -57,4 +57,11 @@ public class UserDAO {
         }
         return resList;
     }
+
+    public void updateUser(User user) {
+        try {
+            entityManager.merge(user);
+        } catch (Exception e) {
+        }
+    }
 }
