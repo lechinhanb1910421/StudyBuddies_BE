@@ -3,7 +3,7 @@ package com.everett.apis;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.Set;
+import java.util.ArrayList;
 
 import javax.annotation.security.DenyAll;
 import javax.annotation.security.PermitAll;
@@ -27,6 +27,7 @@ import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.eclipse.microprofile.jwt.Claim;
 
 import com.everett.dtos.UserResponseDTO;
+import com.everett.exceptions.checkedExceptions.AvatarNotFoundException;
 import com.everett.exceptions.checkedExceptions.UserNotFoundException;
 import com.everett.exceptions.checkedExceptions.UserPersistedException;
 import com.everett.models.Avatar;
@@ -131,10 +132,7 @@ public class UserAPI {
             System.out.println("GET USER WITH MAIL: " + user_mail);
             User user = userService.getUserByEmail(user_mail);
             UserResponseDTO userResponse = new UserResponseDTO(user);
-            Set<Avatar> avatarSet = user.getAvatars();
-            avatarSet.forEach(avatar -> {
-                userResponse.setSingleAvatar(avatar.getAvaUrl());
-            });
+            userResponse.setAvatars(new ArrayList<Avatar>(user.getAvatars()));
             return Response.ok(userResponse).build();
         } catch (UserNotFoundException e) {
             Message message = new Message("User with email " + user_mail + " not found");
@@ -169,22 +167,20 @@ public class UserAPI {
         }
     }
 
-    @Path("/avatars")
+    @Path("/avatars/{avaId}")
     @DELETE
     @Produces(MediaType.APPLICATION_JSON)
     @PermitAll
-    public Response removeUserAvatar(Avatar avatar) {
-        logger.info("REMOVE AVATAR URL: [" + avatar.getAvaUrl() + "FOR USER: [" + email + "]");
+    public Response removeUserAvatar(@PathParam("avaId") Long avaId) {
+        logger.info("REMOVE AVATAR ID: [" + avaId + "FOR USER: [" + email + "]");
         try {
-            userService.removeUserAvatar(email, avatar.getAvaUrl());
-            Message message = new Message(
-                    "Avatar Url: [" + avatar.getAvaUrl() + "] was successfully remove for user: [" + email + "]");
-            return Response.ok(message).build();
-        } catch (UserNotFoundException e) {
-            logger.error("USER WITH EMAIL " + email + " NOT FOUND");
-            Message errMessage = new Message("User with email " + email + " not found");
-            throw new WebApplicationException(Response.status(400).entity(errMessage).build());
+            userService.removeAvatarById(avaId);
+        } catch (AvatarNotFoundException e) {
+            Message err = new Message("Avatar ID: [" + avaId + "] not exists");
+            throw new WebApplicationException(Response.status(400).entity(err).build());
         }
+        Message message = new Message("Avatar ID: [" + avaId + "] was successfully remove for user:  [" + email + "]");
+        return Response.ok(message).build();
     }
 
 }
