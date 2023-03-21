@@ -5,6 +5,7 @@ import java.util.List;
 import com.everett.dtos.CommentResponseDTO;
 import com.everett.dtos.PostReceiveDTO;
 import com.everett.dtos.PostResponseDTO;
+import com.everett.exceptions.checkedExceptions.DeletePostNotAuthorizedException;
 import com.everett.exceptions.checkedExceptions.EmptyCommentException;
 import com.everett.exceptions.checkedExceptions.EmptyEntityException;
 import com.everett.exceptions.checkedExceptions.EmptyReactionException;
@@ -24,7 +25,7 @@ public interface PostService {
 
     public List<PostResponseDTO> getAllUserPosts(String email);
 
-    public void deletePost(Long id);
+    public void deletePost(Long id, String email, String loginName) throws DeletePostNotAuthorizedException;
 
     public void updatePost(Long id, PostReceiveDTO payload);
 

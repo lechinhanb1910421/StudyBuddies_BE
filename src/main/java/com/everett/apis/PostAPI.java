@@ -21,6 +21,7 @@ import org.eclipse.microprofile.jwt.Claim;
 import org.eclipse.microprofile.jwt.JsonWebToken;
 
 import com.everett.dtos.PostReceiveDTO;
+import com.everett.exceptions.checkedExceptions.DeletePostNotAuthorizedException;
 import com.everett.exceptions.checkedExceptions.EmptyCommentException;
 import com.everett.exceptions.checkedExceptions.EmptyEntityException;
 import com.everett.exceptions.checkedExceptions.EmptyReactionException;
@@ -125,11 +126,16 @@ public class PostAPI {
     @Path("/{id}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response deletePost(@PathParam("id") Long id) {
-        postService.deletePost(id);
-        logger.info("POST " + id + " WAS DELETED SUCCESSFULLY");
-        Message message = new Message("Post was deleted successfully");
+        try {
+            postService.deletePost(id, email, loginName);
+            logger.info("POST " + id + " WAS DELETED SUCCESSFULLY");
+            Message message = new Message("Post was deleted successfully");
+            return Response.ok(message).build();
+        } catch (DeletePostNotAuthorizedException e) {
+            Message message = new Message("User [" + email + "] does not have permission to delete post [" + id + "]");
+            throw new WebApplicationException(Response.status(403).entity(message).build());
+        }
         // isUpdated.set(true);
-        return Response.ok(message).build();
     }
 
     @Path("/{id}/react")

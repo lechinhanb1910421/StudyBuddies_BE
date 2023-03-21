@@ -24,6 +24,7 @@ import com.everett.daos.UserDAO;
 import com.everett.dtos.CommentResponseDTO;
 import com.everett.dtos.PostReceiveDTO;
 import com.everett.dtos.PostResponseDTO;
+import com.everett.exceptions.checkedExceptions.DeletePostNotAuthorizedException;
 import com.everett.exceptions.checkedExceptions.EmptyCommentException;
 import com.everett.exceptions.checkedExceptions.EmptyEntityException;
 import com.everett.exceptions.checkedExceptions.EmptyReactionException;
@@ -146,8 +147,13 @@ public class PostServiceImp implements PostService {
     }
 
     @Override
-    public void deletePost(Long id) {
-        getPostById(id);
+    @TransactionAttribute(TransactionAttributeType.REQUIRED)
+    public void deletePost(Long id, String email, String loginName) throws DeletePostNotAuthorizedException {
+        Post post = getPostById(id);
+        User owner = post.getOwnerUser();
+        if (!owner.getEmail().equals(email) || !owner.getLoginName().equals(loginName)) {
+            throw new DeletePostNotAuthorizedException();
+        }
         postDAO.deletePost(id);
     }
 
