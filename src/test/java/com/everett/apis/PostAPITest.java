@@ -2,7 +2,9 @@ package com.everett.apis;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -12,6 +14,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 
 import org.junit.jupiter.api.BeforeAll;
@@ -27,6 +30,7 @@ import org.mockito.quality.Strictness;
 
 import com.everett.dtos.PostReceiveDTO;
 import com.everett.dtos.PostResponseDTO;
+import com.everett.exceptions.checkedExceptions.DeletePostNotAuthorizedException;
 import com.everett.exceptions.checkedExceptions.UserNotFoundException;
 import com.everett.models.Major;
 import com.everett.models.Post;
@@ -84,11 +88,11 @@ public class PostAPITest {
 
     // @Test
     // public void testCreatePostMissingKeys() {
-    //     PostReceiveDTO incommpletedPayload = new PostReceiveDTO("test post",
-    //             "public", null, null, "test/url");
-    //     assertThrows(WebApplicationException.class, () -> {
-    //         postAPI.createPost(incommpletedPayload);
-    //     });
+    // PostReceiveDTO incommpletedPayload = new PostReceiveDTO("test post",
+    // "public", null, null, "test/url");
+    // assertThrows(WebApplicationException.class, () -> {
+    // postAPI.createPost(incommpletedPayload);
+    // });
     // }
 
     @Test
@@ -127,10 +131,19 @@ public class PostAPITest {
     }
 
     @Test
-    public void testDeletePost() {
+    public void testDeletePost() throws DeletePostNotAuthorizedException {
         Response res = postAPI.deletePost(1l);
         assertEquals(200, res.getStatus());
         assertNotNull(res.getEntity());
-        verify(postService).deletePost(1l);
+        verify(postService).deletePost(1l, null, null);
+    }
+
+    @Test
+    public void testDeletePostNotAuth() throws DeletePostNotAuthorizedException {
+        // doThrow(DeletePostNotAuthorizedException.class).when(postService).deletePost(1l,
+        // null, null);
+        // assertThrows(WebApplicationException.class, () -> {
+        // postAPI.deletePost(1l);
+        // });
     }
 }

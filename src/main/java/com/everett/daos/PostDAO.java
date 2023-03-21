@@ -68,7 +68,7 @@ public class PostDAO {
         List<Post> resList = null;
         try {
             TypedQuery<Post> postQuery = entityManager
-                    .createQuery("FROM Posts p ORDER BY p.postId", Post.class);
+                    .createQuery("FROM Posts p ORDER BY p.postId DESC", Post.class);
             resList = postQuery.getResultList();
         } catch (Exception e) {
             e.printStackTrace();

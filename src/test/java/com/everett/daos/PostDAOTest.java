@@ -64,8 +64,8 @@ public class PostDAOTest {
 
     // @Test
     // public void testCreatePost() {
-    //     postDAO.createPost(post1);
-    //     verify(entityManager, times(1)).persist(post1);
+    // postDAO.createPost(post1);
+    // verify(entityManager, times(1)).persist(post1);
     // }
 
     @Test
@@ -73,11 +73,11 @@ public class PostDAOTest {
         List<Post> posts = new ArrayList<Post>();
         posts.add(post1);
         posts.add(post2);
-        when(entityManager.createQuery("FROM Posts p ORDER BY p.postId", Post.class)).thenReturn(typedQueryPost);
+        when(entityManager.createQuery("FROM Posts p ORDER BY p.postId DESC", Post.class)).thenReturn(typedQueryPost);
         when(typedQueryPost.getResultList()).thenReturn(posts);
         List<Post> actualPosts = postDAO.getAllPosts();
         assertEquals(posts.size(), actualPosts.size());
-        verify(entityManager, times(1)).createQuery("FROM Posts p ORDER BY p.postId", Post.class);
+        verify(entityManager, times(1)).createQuery("FROM Posts p ORDER BY p.postId DESC", Post.class);
         verify(typedQueryPost, times(1)).getResultList();
     }
 
@@ -86,14 +86,14 @@ public class PostDAOTest {
         List<Post> posts = new ArrayList<Post>();
         posts.add(post1);
         posts.add(post2);
-        when(entityManager.createQuery("FROM Posts p ORDER BY p.postId", Post.class)).thenReturn(typedQueryPost);
+        when(entityManager.createQuery("FROM Posts p ORDER BY p.postId DESC", Post.class)).thenReturn(typedQueryPost);
         when(typedQueryPost.getResultList()).thenReturn(posts);
         List<Post> actualPosts = postDAO.getAllPosts();
         assertEquals(posts.size(), actualPosts.size());
         Post actualFirst = actualPosts.get(0);
         assertEquals(actualFirst.getContent(), post1.getContent());
         assertEquals(actualFirst.getCreatedTime(), post1.getCreatedTime());
-        verify(entityManager, times(1)).createQuery("FROM Posts p ORDER BY p.postId", Post.class);
+        verify(entityManager, times(1)).createQuery("FROM Posts p ORDER BY p.postId DESC", Post.class);
         verify(typedQueryPost, times(1)).getResultList();
     }
 
