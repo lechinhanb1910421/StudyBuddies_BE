@@ -1,10 +1,17 @@
 package com.everett.dtos;
 
+import java.sql.Timestamp;
+
 import com.everett.models.Comment;
+import com.everett.utils.TimestampSerializer;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 public class CommentResponseDTO {
     private Long commentId;
     private String content;
+
+    @JsonSerialize(using = TimestampSerializer.class)
+    private Timestamp createdTime;
     private Long postId;
     private Long userId;
 
@@ -14,6 +21,7 @@ public class CommentResponseDTO {
     public CommentResponseDTO(Comment comment) {
         this.commentId = comment.getCommentId();
         this.content = comment.getContent();
+        this.createdTime = comment.getCreatedTime();
         this.postId = comment.getPost().getPostId();
         this.userId = comment.getUser().getUserId();
     }
@@ -55,6 +63,14 @@ public class CommentResponseDTO {
 
     public void setUserId(Long userId) {
         this.userId = userId;
+    }
+
+    public Timestamp getCreatedTime() {
+        return createdTime;
+    }
+
+    public void setCreatedTime(Timestamp createdTime) {
+        this.createdTime = createdTime;
     }
 
 }

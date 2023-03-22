@@ -34,7 +34,7 @@ public class CommentDAO {
         List<Comment> resList = null;
         try {
             TypedQuery<Comment> postQuery = entityManager
-                    .createQuery("FROM Comments c ORDER BY c.commentId", Comment.class);
+                    .createQuery("FROM Comments c ORDER BY c.commentId DESC", Comment.class);
             resList = postQuery.getResultList();
         } catch (Exception e) {
             e.printStackTrace();
@@ -46,7 +46,8 @@ public class CommentDAO {
         List<Comment> res = null;
         try {
             TypedQuery<Comment> query = entityManager
-                    .createQuery("FROM Comments c WHERE c.post.postId = :postId", Comment.class);
+                    .createQuery("FROM Comments c WHERE c.post.postId = :postId ORDER BY c.commentId DESC",
+                            Comment.class);
             res = query.setParameter("postId", postId).getResultList();
         } catch (Exception e) {
             e.printStackTrace();
