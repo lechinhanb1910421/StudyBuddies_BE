@@ -106,8 +106,8 @@ public class PostServiceImp implements PostService {
     public PostResponseDTO getPostResponseById(Long id) {
         Post post = getPostById(id);
         PostResponseDTO result = new PostResponseDTO(post);
-        result.setReactsCount(postDAO.getAllPostReactionsCount(id));
-        result.setCommentsCount(postDAO.getAllPostCommentsCount(id));
+        // result.setReactsCount(postDAO.getAllPostReactionsCount(id));
+        // result.setCommentsCount(postDAO.getAllPostCommentsCount(id));
         Set<Picture> pictures = post.getPictures();
         pictures.forEach((pic) -> {
             result.setPicUrls(pic.getPicUrl());
@@ -134,8 +134,8 @@ public class PostServiceImp implements PostService {
         List<PostResponseDTO> results = new ArrayList<>();
         for (Post post : postList) {
             PostResponseDTO responseDTO = new PostResponseDTO(post);
-            responseDTO.setReactsCount(postDAO.getAllPostReactionsCount(post.getPostId()));
-            responseDTO.setCommentsCount(postDAO.getAllPostCommentsCount(post.getPostId()));
+            // responseDTO.setReactsCount(postDAO.getAllPostReactionsCount(post.getPostId()));
+            // responseDTO.setCommentsCount(postDAO.getAllPostCommentsCount(post.getPostId()));
             Set<Picture> pictures = post.getPictures();
             pictures.forEach((pic) -> {
                 responseDTO.setPicUrls(pic.getPicUrl());
@@ -187,8 +187,8 @@ public class PostServiceImp implements PostService {
         List<PostResponseDTO> results = new ArrayList<>();
         for (Post post : postList) {
             PostResponseDTO responseDTO = new PostResponseDTO(post);
-            responseDTO.setReactsCount(Long.valueOf(post.getReactedUser().size()));
-            responseDTO.setCommentsCount(Long.valueOf(post.getCommentUser().size()));
+            // responseDTO.setReactsCount(Long.valueOf(post.getReactedUser().size()));
+            // responseDTO.setCommentsCount(Long.valueOf(post.getCommentUser().size()));
             Set<Picture> pictures = post.getPictures();
             pictures.forEach((pic) -> {
                 responseDTO.setPicUrls(pic.getPicUrl());
@@ -212,8 +212,8 @@ public class PostServiceImp implements PostService {
             logger.info("GET POSTS FROM USER: " + user.getLoginName());
             for (Post post : postList) {
                 PostResponseDTO responseDTO = new PostResponseDTO(post);
-                responseDTO.setReactsCount(Long.valueOf(post.getReactedUser().size()));
-                responseDTO.setCommentsCount(Long.valueOf(post.getCommentUser().size()));
+                // responseDTO.setReactsCount(Long.valueOf(post.getReactedUser().size()));
+                // responseDTO.setCommentsCount(Long.valueOf(post.getCommentUser().size()));
                 Set<Picture> pictures = post.getPictures();
                 pictures.forEach((pic) -> {
                     responseDTO.setPicUrls(pic.getPicUrl());

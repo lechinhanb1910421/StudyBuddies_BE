@@ -65,7 +65,7 @@ public class PostAPITest {
         this.user = new User("B1910421", "Nhan", "Le", "test@mail.com", createdTime, "active");
         this.post1 = new Post(user, createdTime, "Test Post 1", "public", topic, major);
         this.post2 = new Post(user, createdTime, "Test Post 2", "public", topic, major);
-        this.postResponse = new PostResponseDTO(1l, 1L, createdTime, "Test post", "general", "general", 27l, 27l);
+        this.postResponse = new PostResponseDTO(1l, 1L, createdTime, "Test post", "general", "general");
         this.email = "tester@mail.com";
     }
 

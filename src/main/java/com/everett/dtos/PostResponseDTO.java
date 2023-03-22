@@ -17,24 +17,21 @@ public class PostResponseDTO {
     private String content;
     private String topicName;
     private String majorName;
-    private Long reactsCount;
-    private Long commentsCount;
+    // private Long reactsCount;
+    // private Long commentsCount;
     private List<String> picUrls = new ArrayList<String>();
 
     public PostResponseDTO() {
     }
 
     public PostResponseDTO(Long postId, Long userId, Timestamp createdTime, String content, String topicName,
-            String majorName,
-            Long reactsCount, Long commentsCount) {
+            String majorName) {
         this.postId = postId;
         this.userId = userId;
         this.createdTime = createdTime;
         this.content = content;
         this.topicName = topicName;
         this.majorName = majorName;
-        this.reactsCount = reactsCount;
-        this.commentsCount = commentsCount;
     }
 
     public PostResponseDTO(Post post) {
@@ -90,21 +87,21 @@ public class PostResponseDTO {
         this.postId = postId;
     }
 
-    public Long getReactsCount() {
-        return reactsCount;
-    }
+    // public Long getReactsCount() {
+    // return reactsCount;
+    // }
 
-    public void setReactsCount(Long reactsCount) {
-        this.reactsCount = reactsCount;
-    }
+    // public void setReactsCount(Long reactsCount) {
+    // this.reactsCount = reactsCount;
+    // }
 
-    public Long getCommentsCount() {
-        return commentsCount;
-    }
+    // public Long getCommentsCount() {
+    // return commentsCount;
+    // }
 
-    public void setCommentsCount(Long commentsCount) {
-        this.commentsCount = commentsCount;
-    }
+    // public void setCommentsCount(Long commentsCount) {
+    // this.commentsCount = commentsCount;
+    // }
 
     public List<String> getPicUrls() {
         return picUrls;
