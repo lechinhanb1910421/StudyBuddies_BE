@@ -179,10 +179,15 @@ public class Post {
         this.pictures = pictures;
     }
 
+    public void removeAllPic() {
+        this.pictures.clear();
+    }
+
     public void setPicture(Picture picture) {
         this.pictures.add(picture);
         picture.setPost(this);
     }
+
     public void unsetPicture(Picture picture) {
         this.pictures.remove(picture);
         picture.setPost(null);

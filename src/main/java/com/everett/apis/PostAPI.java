@@ -110,7 +110,7 @@ public class PostAPI {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response updatePost(@PathParam("id") Long id, PostReceiveDTO payload) {
-        if (payload.isMissingKeys()) {
+        if (!payload.isUpdatable()) {
             logger.error("UPDATE POST REQUEST IS MISSING KEYS");
             Message message = new Message("Update post request is missing keys");
             throw new WebApplicationException(Response.status(400).entity(message).build());

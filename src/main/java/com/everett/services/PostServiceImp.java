@@ -162,8 +162,20 @@ public class PostServiceImp implements PostService {
     public void updatePost(Long id, PostReceiveDTO payload) {
         Post oldPost;
         oldPost = getPostById(id);
-        Long topicId = payload.getTopicId();
-        Long majorId = payload.getMajorId();
+        // oldPost.setPicturesSet(oldPost.getPictures());
+        Long majorId = null;
+        Long topicId = null;
+        String newContent = null;
+        String imgUrl = null;
+        try {
+            majorId = payload.getMajorId();
+            topicId = payload.getTopicId();
+            newContent = payload.getContent();
+            imgUrl = payload.getImageUrl();
+
+        } catch (NullPointerException ex) {
+
+        }
         if (topicId != null) {
             try {
                 oldPost.setTopic(topicDAO.getTopicById(topicId));
@@ -177,6 +189,14 @@ public class PostServiceImp implements PostService {
             } catch (MajorNotFoundException e) {
                 throw new MajorNotFoundWebException(majorId);
             }
+        }
+        if (newContent != null) {
+            oldPost.setContent(newContent);
+        }
+        if (imgUrl != null) {
+            Picture newPic = new Picture(imgUrl);
+            oldPost.removeAllPic();
+            oldPost.setPicture(newPic);
         }
         postDAO.updatePost(oldPost);
     }
@@ -263,8 +283,9 @@ public class PostServiceImp implements PostService {
     @TransactionAttribute(TransactionAttributeType.REQUIRED)
     public List<CommentResponseDTO> getCommentsByPostId(Long postId)
             throws EmptyCommentException, EmptyEntityException {
-        Post post = postDAO.getPostById(postId);
-        Set<Comment> comments = new HashSet<Comment>(post.getCommentUser());
+        // Post post = postDAO.getPostById(postId);
+        // Set<Comment> comments = new HashSet<Comment>(post.getCommentUser());
+        List<Comment> comments = commentDAO.getCommentsByPostId(postId);
         if (comments.size() == 0) {
             throw new EmptyCommentException();
         }

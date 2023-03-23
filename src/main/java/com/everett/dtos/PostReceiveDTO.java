@@ -61,6 +61,23 @@ public class PostReceiveDTO {
     }
 
     @JsonIgnore
+    public boolean isUpdatable() {
+        if (this.content != null) {
+            return true;
+        }
+        if (this.imageUrl != null) {
+            return true;
+        }
+        if (this.topicId != null) {
+            return true;
+        }
+        if (this.majorId != null) {
+            return true;
+        }
+        return false;
+    }
+
+    @JsonIgnore
     public boolean isMissingKeys() {
         if (this.content == null) {
             return true;
