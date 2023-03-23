@@ -6,15 +6,21 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.TypedQuery;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import com.everett.exceptions.checkedExceptions.CommentNotFoundException;
 import com.everett.exceptions.checkedExceptions.EmptyCommentException;
 import com.everett.models.Comment;
 
 public class CommentDAO {
+    private static final Logger logger = LogManager.getLogger(CommentDAO.class);
+
     @PersistenceContext(unitName = "primary")
     EntityManager entityManager;
 
     public Comment getCommentById(Long id) throws CommentNotFoundException {
+        logger.info("GET COMMENT WITH ID: " + id);
         Comment cmt = entityManager.find(Comment.class, id);
         if (cmt == null) {
             throw new CommentNotFoundException();
@@ -23,6 +29,7 @@ public class CommentDAO {
     }
 
     public void addComment(Comment comment) {
+        logger.info("ADD COMMENT TO DB");
         try {
             entityManager.persist(comment);
         } catch (Exception e) {
@@ -31,6 +38,7 @@ public class CommentDAO {
     }
 
     public List<Comment> getAllComments() {
+        logger.info("GET ALL COMMENTS");
         List<Comment> resList = null;
         try {
             TypedQuery<Comment> postQuery = entityManager
@@ -43,6 +51,8 @@ public class CommentDAO {
     }
 
     public List<Comment> getCommentsByPostId(Long postId) throws EmptyCommentException {
+        logger.info("GET ALL COMMENTS FROM POST ID: " + postId);
+
         List<Comment> res = null;
         try {
             TypedQuery<Comment> query = entityManager
@@ -60,6 +70,7 @@ public class CommentDAO {
     }
 
     public void deleteComment(Long cmtId) throws CommentNotFoundException {
+        logger.info("DELETE CMT WITH ID: " + cmtId);
         Comment comment = entityManager.find(Comment.class, cmtId);
         if (comment == null) {
             throw new CommentNotFoundException();

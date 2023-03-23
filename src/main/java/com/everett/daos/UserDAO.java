@@ -7,16 +7,22 @@ import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
 import javax.persistence.TypedQuery;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import com.everett.exceptions.checkedExceptions.UserNotFoundException;
 import com.everett.models.User;
 
 public class UserDAO {
+    private static final Logger logger = LogManager.getLogger(UserDAO.class);
+
     @PersistenceContext(unitName = "primary")
     EntityManager entityManager;
 
     public User getUserById(Long id) throws UserNotFoundException {
         User user = null;
         try {
+            logger.info("GETTING USER INFO WITH ID" + id);
             user = entityManager.find(User.class, id);
         } catch (Exception e) {
             e.printStackTrace();
@@ -31,6 +37,7 @@ public class UserDAO {
     public User getUserByEmail(String email) throws UserNotFoundException {
         User user = null;
         try {
+            logger.info("GETTING USER INFO WITH MAIL: " + email);
             TypedQuery<User> query = entityManager.createQuery("FROM Users s WHERE s.email = :email", User.class);
             user = query.setParameter("email", email).getSingleResult();
         } catch (NoResultException e) {
