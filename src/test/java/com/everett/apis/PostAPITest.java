@@ -31,6 +31,7 @@ import org.mockito.quality.Strictness;
 import com.everett.dtos.PostReceiveDTO;
 import com.everett.dtos.PostResponseDTO;
 import com.everett.exceptions.checkedExceptions.DeletePostNotAuthorizedException;
+import com.everett.exceptions.checkedExceptions.EmptyEntityException;
 import com.everett.exceptions.checkedExceptions.UserNotFoundException;
 import com.everett.models.Major;
 import com.everett.models.Post;
@@ -105,7 +106,7 @@ public class PostAPITest {
     }
 
     @Test
-    public void testGetPostById() {
+    public void testGetPostById() throws EmptyEntityException {
         when(postService.getPostResponseById(1L)).thenReturn(postResponse);
         Response res = postAPI.getPostById(1L);
         assertEquals(200, res.getStatus());
@@ -122,7 +123,7 @@ public class PostAPITest {
     // }
 
     @Test
-    public void testUpdatePost() {
+    public void testUpdatePost() throws EmptyEntityException {
         PostReceiveDTO postPayload = new PostReceiveDTO("Test Post", "Public", 1l, 1l, "test_url");
         Response res = postAPI.updatePost(1l, postPayload);
         assertEquals(200, res.getStatus());
@@ -131,7 +132,7 @@ public class PostAPITest {
     }
 
     @Test
-    public void testDeletePost() throws DeletePostNotAuthorizedException {
+    public void testDeletePost() throws DeletePostNotAuthorizedException, EmptyEntityException {
         Response res = postAPI.deletePost(1l);
         assertEquals(200, res.getStatus());
         assertNotNull(res.getEntity());
