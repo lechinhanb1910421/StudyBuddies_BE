@@ -14,6 +14,7 @@ import javax.ws.rs.core.Response;
 import com.everett.daos.CommentDAO;
 import com.everett.dtos.CommentResponseDTO;
 import com.everett.exceptions.checkedExceptions.CommentNotFoundException;
+import com.everett.exceptions.checkedExceptions.EmptyEntityException;
 import com.everett.exceptions.checkedExceptions.UserNotFoundException;
 import com.everett.models.Comment;
 import com.everett.models.Message;
@@ -38,14 +39,16 @@ public class CommentServiceImp implements CommentService {
             Post post = postService.getPostById(postId);
             User user = userService.getUserByEmail(email);
             Timestamp createdTime = Timestamp.from(Instant.now().truncatedTo(ChronoUnit.SECONDS));
-
             Comment comment = new Comment(post, user, createdTime, content);
             commentDAO.addComment(comment);
-        } catch (
-
-        UserNotFoundException e) {
-            Message msg = new Message("User with id does not exist");
+        } catch (UserNotFoundException e) {
+            Message msg = new Message("User with email " + email + " does not exist");
             throw new WebApplicationException(Response.status(400).entity(msg).build());
+        } catch (EmptyEntityException e) {
+            Message msg = new Message("Post with id:" + postId + " does not exist");
+            throw new WebApplicationException(Response.status(400).entity(msg).build());
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 

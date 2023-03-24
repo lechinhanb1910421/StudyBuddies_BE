@@ -31,7 +31,6 @@ import com.everett.exceptions.checkedExceptions.EmptyReactionException;
 import com.everett.exceptions.checkedExceptions.MajorNotFoundException;
 import com.everett.exceptions.checkedExceptions.TopicNotFoundException;
 import com.everett.exceptions.checkedExceptions.UserNotFoundException;
-import com.everett.exceptions.webExceptions.IdNotFoundException;
 import com.everett.exceptions.webExceptions.InternalServerError;
 import com.everett.exceptions.webExceptions.MajorNotFoundWebException;
 import com.everett.exceptions.webExceptions.TopicNotFoundWebException;
@@ -103,7 +102,7 @@ public class PostServiceImp implements PostService {
 
     @Override
     @TransactionAttribute(TransactionAttributeType.REQUIRED)
-    public PostResponseDTO getPostResponseById(Long id) {
+    public PostResponseDTO getPostResponseById(Long id) throws EmptyEntityException {
         Post post = getPostById(id);
         PostResponseDTO result = new PostResponseDTO(post);
         // result.setReactsCount(postDAO.getAllPostReactionsCount(id));
@@ -116,15 +115,11 @@ public class PostServiceImp implements PostService {
     }
 
     @Override
-    public Post getPostById(Long id) {
+    public Post getPostById(Long id) throws EmptyEntityException {
         if (id < 1) {
-            throw new IdNotFoundException(id);
+            throw new EmptyEntityException(id);
         }
-        try {
-            return postDAO.getPostById(id);
-        } catch (EmptyEntityException e) {
-            throw new IdNotFoundException(id);
-        }
+        return postDAO.getPostById(id);
     }
 
     @Override
@@ -148,7 +143,8 @@ public class PostServiceImp implements PostService {
 
     @Override
     @TransactionAttribute(TransactionAttributeType.REQUIRED)
-    public void deletePost(Long id, String email, String loginName) throws DeletePostNotAuthorizedException {
+    public void deletePost(Long id, String email, String loginName)
+            throws DeletePostNotAuthorizedException, EmptyEntityException {
         Post post = getPostById(id);
         User owner = post.getOwnerUser();
         if (!owner.getEmail().equals(email) || !owner.getLoginName().equals(loginName)) {
@@ -159,7 +155,7 @@ public class PostServiceImp implements PostService {
 
     @Override
     @TransactionAttribute(TransactionAttributeType.REQUIRED)
-    public void updatePost(Long id, PostReceiveDTO payload) {
+    public void updatePost(Long id, PostReceiveDTO payload) throws EmptyEntityException {
         Post oldPost;
         oldPost = getPostById(id);
         // oldPost.setPicturesSet(oldPost.getPictures());
@@ -195,6 +191,11 @@ public class PostServiceImp implements PostService {
         }
         if (imgUrl != null) {
             Picture newPic = new Picture(imgUrl);
+            oldPost.removeAllPic();
+            oldPost.setPicture(newPic);
+        }
+        if (imgUrl == "") {
+            Picture newPic = new Picture("");
             oldPost.removeAllPic();
             oldPost.setPicture(newPic);
         }

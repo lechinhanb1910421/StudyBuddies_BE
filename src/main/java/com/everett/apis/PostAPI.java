@@ -102,7 +102,13 @@ public class PostAPI {
     @Produces(MediaType.APPLICATION_JSON)
     public Response getPostById(@PathParam("id") Long id) {
         logger.info("GET POST BY ID: " + id);
-        return Response.ok(postService.getPostResponseById(id)).build();
+        try {
+            return Response.ok(postService.getPostResponseById(id)).build();
+        } catch (EmptyEntityException e) {
+            logger.warn("POST WITH ID: " + id + "NOT FOUND");
+            Message message = new Message("Post with id " + id + " was not found");
+            throw new WebApplicationException(Response.status(400).entity(message).build());
+        }
     }
 
     @PUT
@@ -115,11 +121,17 @@ public class PostAPI {
             Message message = new Message("Update post request is missing keys");
             throw new WebApplicationException(Response.status(400).entity(message).build());
         }
-        postService.updatePost(id, payload);
-        logger.info("POST WITH ID: " + id + " WAS UPDATED SUCCESSFULLY");
-        Message message = new Message("Post was updated successfully");
-        // isUpdated.set(true);
-        return Response.ok(message).build();
+        try {
+            postService.updatePost(id, payload);
+            logger.info("POST WITH ID: " + id + " WAS UPDATED SUCCESSFULLY");
+            Message message = new Message("Post was updated successfully");
+            // isUpdated.set(true);
+            return Response.ok(message).build();
+        } catch (EmptyEntityException e) {
+            logger.warn("POST WITH ID: " + id + "NOT FOUND");
+            Message message = new Message("Post with id " + id + " was not found");
+            throw new WebApplicationException(Response.status(400).entity(message).build());
+        }
     }
 
     @DELETE
@@ -134,8 +146,11 @@ public class PostAPI {
         } catch (DeletePostNotAuthorizedException e) {
             Message message = new Message("User [" + email + "] does not have permission to delete post [" + id + "]");
             throw new WebApplicationException(Response.status(403).entity(message).build());
+        } catch (EmptyEntityException e) {
+            logger.warn("POST WITH ID: " + id + "NOT FOUND");
+            Message message = new Message("Post with id " + id + " was not found");
+            throw new WebApplicationException(Response.status(400).entity(message).build());
         }
-        // isUpdated.set(true);
     }
 
     @Path("/{id}/react")

@@ -17,17 +17,18 @@ public interface PostService {
 
     public void createPost(PostReceiveDTO payload, String email) throws UserNotFoundException;
 
-    public PostResponseDTO getPostResponseById(Long id);
+    public PostResponseDTO getPostResponseById(Long id) throws EmptyEntityException;
 
-    public Post getPostById(Long id);
+    public Post getPostById(Long id) throws EmptyEntityException;
 
     public List<PostResponseDTO> getAllPosts();
 
     public List<PostResponseDTO> getAllUserPosts(String email);
 
-    public void deletePost(Long id, String email, String loginName) throws DeletePostNotAuthorizedException;
+    public void deletePost(Long id, String email, String loginName)
+            throws DeletePostNotAuthorizedException, EmptyEntityException;
 
-    public void updatePost(Long id, PostReceiveDTO payload);
+    public void updatePost(Long id, PostReceiveDTO payload) throws EmptyEntityException;
 
     public List<PostResponseDTO> seachPostsByKeywords(String keywords);
 
