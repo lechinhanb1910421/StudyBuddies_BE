@@ -144,13 +144,19 @@ public class UserAPI {
         }
     }
 
-    @Path("/posts")
+    @Path("/{userId}/posts")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @PermitAll
-    public Response getAllUserPost() {
+    public Response getAllUserPost(@PathParam("userId") Long userId) {
         logger.info("GET ALL USER POSTS");
-        return Response.ok(postService.getAllUserPosts(email)).build();
+        try {
+            return Response.ok(postService.getAllUserPosts(userId)).build();
+        } catch (UserNotFoundException e) {
+        logger.info("USER WITH ID: " + userId + " NOT FOUND");
+        Message message = new Message("User with id: " + userId + " not found");
+            throw new WebApplicationException(Response.status(400).entity(message).build());
+        }
     }
 
     @Path("/avatars")

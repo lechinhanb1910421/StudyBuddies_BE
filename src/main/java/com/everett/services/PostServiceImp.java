@@ -221,20 +221,16 @@ public class PostServiceImp implements PostService {
 
     @Override
     @TransactionAttribute(TransactionAttributeType.REQUIRED)
-    public List<PostResponseDTO> getAllUserPosts(String email) {
-        User user;
+    public List<PostResponseDTO> getAllUserPosts(Long userId) throws UserNotFoundException {
+
         List<Post> postList;
         List<PostResponseDTO> results = new ArrayList<PostResponseDTO>();
         try {
-            user = userDAO.getUserByEmail(email);
-            Set<Post> setPost = new HashSet<Post>();
-            setPost = user.getPosts();
-            postList = new ArrayList<Post>(setPost);
+            User user = userDAO.getUserById(userId);
+            postList = postDAO.getAllUserPosts(user.getEmail());
             logger.info("GET POSTS FROM USER: " + user.getLoginName());
             for (Post post : postList) {
                 PostResponseDTO responseDTO = new PostResponseDTO(post);
-                // responseDTO.setReactsCount(Long.valueOf(post.getReactedUser().size()));
-                // responseDTO.setCommentsCount(Long.valueOf(post.getCommentUser().size()));
                 Set<Picture> pictures = post.getPictures();
                 pictures.forEach((pic) -> {
                     responseDTO.setPicUrls(pic.getPicUrl());

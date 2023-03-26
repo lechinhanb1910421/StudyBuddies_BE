@@ -23,7 +23,7 @@ public interface PostService {
 
     public List<PostResponseDTO> getAllPosts();
 
-    public List<PostResponseDTO> getAllUserPosts(String email);
+    public List<PostResponseDTO> getAllUserPosts(Long userId) throws UserNotFoundException;
 
     public void deletePost(Long id, String email, String loginName)
             throws DeletePostNotAuthorizedException, EmptyEntityException;
