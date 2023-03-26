@@ -153,8 +153,8 @@ public class UserAPI {
         try {
             return Response.ok(postService.getAllUserPosts(userId)).build();
         } catch (UserNotFoundException e) {
-        logger.info("USER WITH ID: " + userId + " NOT FOUND");
-        Message message = new Message("User with id: " + userId + " not found");
+            logger.info("USER WITH ID: " + userId + " NOT FOUND");
+            Message message = new Message("User with id: " + userId + " not found");
             throw new WebApplicationException(Response.status(400).entity(message).build());
         }
     }

@@ -22,10 +22,10 @@ public class UserDAO {
     public User getUserById(Long id) throws UserNotFoundException {
         User user = null;
         try {
-            logger.info("GETTING USER INFO WITH ID" + id);
+            logger.info("GETTING USER INFO WITH ID " + id);
             user = entityManager.find(User.class, id);
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new UserNotFoundException(id);
         }
         if (user == null) {
             throw new UserNotFoundException(id);

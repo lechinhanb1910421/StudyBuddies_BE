@@ -225,19 +225,16 @@ public class PostServiceImp implements PostService {
 
         List<Post> postList;
         List<PostResponseDTO> results = new ArrayList<PostResponseDTO>();
-        try {
-            User user = userDAO.getUserById(userId);
-            postList = postDAO.getAllUserPosts(user.getEmail());
-            logger.info("GET POSTS FROM USER: " + user.getLoginName());
-            for (Post post : postList) {
-                PostResponseDTO responseDTO = new PostResponseDTO(post);
-                Set<Picture> pictures = post.getPictures();
-                pictures.forEach((pic) -> {
-                    responseDTO.setPicUrls(pic.getPicUrl());
-                });
-                results.add(responseDTO);
-            }
-        } catch (UserNotFoundException e) {
+        User user = userDAO.getUserById(userId);
+        postList = postDAO.getAllUserPosts(user.getEmail());
+        logger.info("GET POSTS FROM USER: " + user.getLoginName());
+        for (Post post : postList) {
+            PostResponseDTO responseDTO = new PostResponseDTO(post);
+            Set<Picture> pictures = post.getPictures();
+            pictures.forEach((pic) -> {
+                responseDTO.setPicUrls(pic.getPicUrl());
+            });
+            results.add(responseDTO);
         }
         return results;
     }
