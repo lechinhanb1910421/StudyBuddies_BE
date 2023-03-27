@@ -4,7 +4,6 @@ import java.sql.Timestamp;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -16,6 +15,7 @@ import javax.inject.Inject;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import com.everett.daos.AvatarDAO;
 import com.everett.daos.CommentDAO;
 import com.everett.daos.MajorDAO;
 import com.everett.daos.PostDAO;
@@ -24,6 +24,7 @@ import com.everett.daos.UserDAO;
 import com.everett.dtos.CommentResponseDTO;
 import com.everett.dtos.PostReceiveDTO;
 import com.everett.dtos.PostResponseDTO;
+import com.everett.dtos.UserResponseDTO;
 import com.everett.exceptions.checkedExceptions.DeletePostNotAuthorizedException;
 import com.everett.exceptions.checkedExceptions.EmptyCommentException;
 import com.everett.exceptions.checkedExceptions.EmptyEntityException;
@@ -55,6 +56,9 @@ public class PostServiceImp implements PostService {
 
     @Inject
     UserDAO userDAO;
+
+    @Inject
+    AvatarDAO avatarDAO;
 
     @Inject
     CommentDAO commentDAO;
@@ -259,18 +263,19 @@ public class PostServiceImp implements PostService {
 
     @Override
     @TransactionAttribute(TransactionAttributeType.REQUIRED)
-    public List<User> getAllPostReation(Long id) throws EmptyEntityException, EmptyReactionException {
+    public List<UserResponseDTO> getAllPostReation(Long id) throws EmptyEntityException, EmptyReactionException {
+        List<UserResponseDTO> result = new ArrayList<UserResponseDTO>();
         Set<User> users = postDAO.getPostById(id).getReactedUser();
         if (users.size() == 0) {
-            System.out.println("REACTED USER NULL");
             throw new EmptyReactionException();
         } else {
-            System.out.println("REACTED USER NOT NULL");
-            for (User user : users) {
-                System.out.println(user);
-            }
-            return new ArrayList<User>(users);
+            users.forEach(user -> {
+                UserResponseDTO userRes = new UserResponseDTO(user);
+                userRes.setAvatars(avatarDAO.getAllAvatarsByUserId(user.getUserId()));
+                result.add(userRes);
+            });
         }
+        return result;
     }
 
     @Override

@@ -80,7 +80,7 @@ public class PostDAO {
         List<Post> resList = null;
         try {
             TypedQuery<Post> postQuery = entityManager.createQuery(
-                    "FROM Posts p WHERE p.user.email = :email ORDER BY p.postId", Post.class);
+                    "FROM Posts p WHERE p.user.email = :email ORDER BY p.postId DESC", Post.class);
             resList = postQuery.setParameter("email", email).getResultList();
         } catch (Exception e) {
             e.printStackTrace();

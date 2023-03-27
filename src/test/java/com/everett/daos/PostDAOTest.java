@@ -103,13 +103,13 @@ public class PostDAOTest {
         List<Post> posts = new ArrayList<Post>();
         posts.add(post1);
         posts.add(post2);
-        when(entityManager.createQuery("FROM Posts p WHERE p.user.email = :email ORDER BY p.postId", Post.class))
+        when(entityManager.createQuery("FROM Posts p WHERE p.user.email = :email ORDER BY p.postId DESC", Post.class))
                 .thenReturn(typedQueryPost);
         when(typedQueryPost.setParameter("email", testMail)).thenReturn(typedQueryPost);
         when(typedQueryPost.getResultList()).thenReturn(posts);
         List<Post> actual = postDAO.getAllUserPosts(testMail);
         assertEquals(posts.size(), actual.size());
-        verify(entityManager, times(1)).createQuery("FROM Posts p WHERE p.user.email = :email ORDER BY p.postId",
+        verify(entityManager, times(1)).createQuery("FROM Posts p WHERE p.user.email = :email ORDER BY p.postId DESC",
                 Post.class);
         verify(typedQueryPost, times(1)).getResultList();
     }
@@ -120,7 +120,7 @@ public class PostDAOTest {
         List<Post> posts = new ArrayList<Post>();
         posts.add(post1);
         posts.add(post2);
-        when(entityManager.createQuery("FROM Posts p WHERE p.user.email = :email ORDER BY p.postId", Post.class))
+        when(entityManager.createQuery("FROM Posts p WHERE p.user.email = :email ORDER BY p.postId DESC", Post.class))
                 .thenReturn(typedQueryPost);
         when(typedQueryPost.setParameter("email", testMail)).thenReturn(typedQueryPost);
         when(typedQueryPost.getResultList()).thenReturn(posts);
@@ -128,7 +128,7 @@ public class PostDAOTest {
         Post actualFirst = actual.get(0);
         assertEquals(actualFirst.getContent(), post1.getContent());
         assertEquals(actualFirst.getCreatedTime(), post1.getCreatedTime());
-        verify(entityManager, times(1)).createQuery("FROM Posts p WHERE p.user.email = :email ORDER BY p.postId",
+        verify(entityManager, times(1)).createQuery("FROM Posts p WHERE p.user.email = :email ORDER BY p.postId DESC",
                 Post.class);
         verify(typedQueryPost, times(1)).getResultList();
     }

@@ -5,13 +5,13 @@ import java.util.List;
 import com.everett.dtos.CommentResponseDTO;
 import com.everett.dtos.PostReceiveDTO;
 import com.everett.dtos.PostResponseDTO;
+import com.everett.dtos.UserResponseDTO;
 import com.everett.exceptions.checkedExceptions.DeletePostNotAuthorizedException;
 import com.everett.exceptions.checkedExceptions.EmptyCommentException;
 import com.everett.exceptions.checkedExceptions.EmptyEntityException;
 import com.everett.exceptions.checkedExceptions.EmptyReactionException;
 import com.everett.exceptions.checkedExceptions.UserNotFoundException;
 import com.everett.models.Post;
-import com.everett.models.User;
 
 public interface PostService {
 
@@ -36,7 +36,7 @@ public interface PostService {
 
     public void removeReactPost(Long id, String email);
 
-    public List<User> getAllPostReation(Long id) throws EmptyReactionException, EmptyEntityException;
+    public List<UserResponseDTO> getAllPostReation(Long id) throws EmptyReactionException, EmptyEntityException;
 
     public List<CommentResponseDTO> getCommentsByPostId(Long postId) throws EmptyCommentException, EmptyEntityException;
 }
