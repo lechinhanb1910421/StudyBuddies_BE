@@ -184,4 +184,8 @@ public class User {
         this.avatars = avatars;
     }
 
+    public void removeAllPic() {
+        this.avatars.clear();
+    }
+
 }

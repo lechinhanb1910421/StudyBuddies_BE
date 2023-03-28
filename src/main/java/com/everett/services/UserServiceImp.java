@@ -73,6 +73,7 @@ public class UserServiceImp implements UserService {
     @Override
     public void addUserAvatar(String userEmail, Avatar avatar) throws UserNotFoundException {
         User user = userDAO.getUserByEmail(userEmail);
+        user.removeAllPic();
         user.setAvatar(avatar);
         userDAO.updateUser(user);
     }
