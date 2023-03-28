@@ -22,6 +22,7 @@ import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Index;
 import org.hibernate.search.annotations.Indexed;
+import org.hibernate.search.annotations.IndexedEmbedded;
 import org.hibernate.search.annotations.Store;
 
 import com.everett.utils.TimestampDeserializer;
@@ -56,10 +57,12 @@ public class Post {
     @Column(name = "audienceMode", nullable = false)
     private String audienceMode;
 
+    @IndexedEmbedded
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "topicId", nullable = false)
     private Topic topic;
 
+    @IndexedEmbedded
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "majorId", nullable = false)
     private Major major;

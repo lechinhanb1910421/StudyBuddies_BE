@@ -207,13 +207,11 @@ public class PostServiceImp implements PostService {
     }
 
     @Override
-    public List<PostResponseDTO> seachPostsByKeywords(String keywords) {
-        List<Post> postList = postDAO.seachPostsByKeywords(keywords);
+    public List<PostResponseDTO> seachPostsByKeywords(String keywords, Long topicId, Long majorId) {
+        List<Post> postList = postDAO.seachPostsByKeywords(keywords, topicId, majorId);
         List<PostResponseDTO> results = new ArrayList<>();
         for (Post post : postList) {
             PostResponseDTO responseDTO = new PostResponseDTO(post);
-            // responseDTO.setReactsCount(Long.valueOf(post.getReactedUser().size()));
-            // responseDTO.setCommentsCount(Long.valueOf(post.getCommentUser().size()));
             Set<Picture> pictures = post.getPictures();
             pictures.forEach((pic) -> {
                 responseDTO.setPicUrls(pic.getPicUrl());

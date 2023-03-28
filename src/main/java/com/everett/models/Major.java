@@ -1,5 +1,6 @@
 package com.everett.models;
 
+import java.util.Objects;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
@@ -12,24 +13,19 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
-import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
-import org.hibernate.search.annotations.Index;
-import org.hibernate.search.annotations.Indexed;
-import org.hibernate.search.annotations.Store;
+import org.hibernate.search.annotations.FieldBridge;
+import org.hibernate.search.bridge.builtin.LongBridge;
 
 @Entity(name = "Majors")
 @Table(name = "Majors", schema = "PUBLIC")
-@Indexed
 public class Major {
     @Id
-    @DocumentId
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "majorId", nullable = false)
     private Long majorId;
 
     @Column(name = "majorName", nullable = false)
-    @Field(index = Index.YES, store = Store.NO)
     private String majorName;
 
     @Column(name = "majorDescription", nullable = false)
@@ -50,6 +46,8 @@ public class Major {
         this.followers = followers;
     }
 
+    @FieldBridge(impl = LongBridge.class)
+    @Field
     public Long getMajorId() {
         return majorId;
     }
@@ -80,6 +78,21 @@ public class Major {
 
     public void setFollowers(Long followers) {
         this.followers = followers;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(majorName);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
+        Major major = (Major) o;
+        return Objects.equals(majorName, major.majorName);
     }
 
 }

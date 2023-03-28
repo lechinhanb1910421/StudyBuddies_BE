@@ -13,6 +13,10 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
+import org.hibernate.search.annotations.Field;
+import org.hibernate.search.annotations.FieldBridge;
+import org.hibernate.search.bridge.builtin.LongBridge;
+
 @Entity(name = "Topics")
 @Table(name = "Topics", schema = "PUBLIC")
 public class Topic {
@@ -42,6 +46,8 @@ public class Topic {
         this.followers = followers;
     }
 
+    @FieldBridge(impl = LongBridge.class)
+    @Field
     public Long getTopicId() {
         return topicId;
     }

@@ -67,12 +67,12 @@ public class PostAPI {
     @GET
     @Path("/search")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response seachRequestsByReason(@QueryParam("keywords") String keywords) {
+    public Response seachRequestsByReason(@QueryParam("keywords") String keywords, @QueryParam("topicId") Long topicId, @QueryParam("majorId") Long majorId){
         if (keywords == null) {
             throw new InvalidSearchKeywordException("Keyword must not be null");
         }
         logger.info("SEARCH POSTS BY KEYWORD: " + keywords);
-        return Response.ok(postService.seachPostsByKeywords(keywords)).build();
+        return Response.ok(postService.seachPostsByKeywords(keywords, topicId, majorId)).build();
     }
 
     @Path("/")

@@ -6,6 +6,8 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.TypedQuery;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.apache.lucene.search.Query;
 import org.hibernate.search.jpa.FullTextEntityManager;
 import org.hibernate.search.jpa.FullTextQuery;
@@ -17,6 +19,8 @@ import com.everett.models.Post;
 import com.everett.models.User;
 
 public class PostDAO {
+    private static final Logger logger = LogManager.getLogger(PostDAO.class);
+
     @PersistenceContext(unitName = "primary")
     EntityManager entityManager;
 
@@ -38,7 +42,7 @@ public class PostDAO {
     }
 
     @SuppressWarnings("unchecked")
-    public List<Post> seachPostsByKeywords(String keywords) {
+    public List<Post> seachPostsByKeywords(String keywords, Long topicId, Long majorId) {
         List<Post> list = null;
         FullTextEntityManager fullTextEntityManager = Search.getFullTextEntityManager(entityManager);
 
@@ -53,13 +57,27 @@ public class PostDAO {
         Query searchKeyword = queryBuilder
                 .simpleQueryString()
                 .onField("content")
-                // .boostedTo(5f)
-                // .andFields("userId")
-                // .boostedTo(2f)
+                .boostedTo(5f)
                 .withAndAsDefaultOperator()
                 .matching(keywordMatch)
                 .createQuery();
-        FullTextQuery jpaQuery = fullTextEntityManager.createFullTextQuery(searchKeyword, Post.class);
+        Query searchTopic = null;
+        Query searchMajor = null;
+        if (topicId != null && topicId != 0) {
+            logger.info("SEARCH INCLUDES TOPIC_ID: " + topicId);
+            searchTopic = queryBuilder.keyword().onField("topic.topicId").matching(topicId).createQuery();
+        }
+        if (majorId != null && majorId != 0) {
+            logger.info("SEARCH INCLUDES MAJOR_ID: " + majorId);
+            searchMajor = queryBuilder.keyword().onField("major.majorId").matching(majorId).createQuery();
+        }
+        Query combinedQuery = queryBuilder
+                .bool()
+                .must(searchKeyword)
+                .must(searchMajor)
+                .must(searchTopic)
+                .createQuery();
+        FullTextQuery jpaQuery = fullTextEntityManager.createFullTextQuery(combinedQuery, Post.class);
         list = jpaQuery.getResultList();
         return list;
     }

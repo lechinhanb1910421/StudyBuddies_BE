@@ -30,7 +30,7 @@ public interface PostService {
 
     public void updatePost(Long id, PostReceiveDTO payload) throws EmptyEntityException;
 
-    public List<PostResponseDTO> seachPostsByKeywords(String keywords);
+    public List<PostResponseDTO> seachPostsByKeywords(String keywords, Long topicId, Long majorId);
 
     public void reactPost(Long id, String email);
 
