@@ -23,4 +23,6 @@ public interface UserService {
     public void addUserAvatar(String userEmail, Avatar avatar) throws UserNotFoundException;
 
     public void removeAvatarById(Long avaId) throws AvatarNotFoundException;
+
+    public Long getCountUsers();
 }

@@ -294,4 +294,9 @@ public class PostServiceImp implements PostService {
 
     }
 
+    @Override
+    public Long getCountPosts(){
+        return postDAO.getCountPosts();
+    }
+
 }

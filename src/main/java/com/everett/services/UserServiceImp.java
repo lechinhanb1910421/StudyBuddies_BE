@@ -82,4 +82,9 @@ public class UserServiceImp implements UserService {
     public void removeAvatarById(Long avaId) throws AvatarNotFoundException {
         avatarDAO.removeAvatarById(avaId);
     }
+
+    @Override
+    public Long getCountUsers() {
+        return userDAO.getCountUsers();
+    }
 }

@@ -39,4 +39,6 @@ public interface PostService {
     public List<UserResponseDTO> getAllPostReation(Long id) throws EmptyReactionException, EmptyEntityException;
 
     public List<CommentResponseDTO> getCommentsByPostId(Long postId) throws EmptyCommentException, EmptyEntityException;
+
+    public Long getCountPosts();
 }

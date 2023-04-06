@@ -167,4 +167,17 @@ public class PostDAO {
         }
         return res;
     }
+
+    public Long getCountPosts() {
+        Long count = null;
+        try {
+            TypedQuery<Long> query = entityManager
+                    .createQuery("SELECT COUNT(*) FROM Posts p",
+                            Long.class);
+            count = query.getSingleResult();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return count;
+    }
 }

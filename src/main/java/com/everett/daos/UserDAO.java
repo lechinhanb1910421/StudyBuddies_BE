@@ -72,4 +72,16 @@ public class UserDAO {
         }
     }
 
+    public Long getCountUsers() {
+        Long count = null;
+        try {
+            TypedQuery<Long> query = entityManager
+                    .createQuery("SELECT COUNT(*) FROM Users s",
+                            Long.class);
+            count = query.getSingleResult();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return count;
+    }
 }
