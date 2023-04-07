@@ -7,6 +7,7 @@ import com.everett.daos.AvatarDAO;
 import com.everett.daos.PostDAO;
 import com.everett.daos.UserDAO;
 import com.everett.dtos.StatsDTO;
+import com.everett.exceptions.checkedExceptions.UserNotFoundException;
 
 @Stateless
 public class AdminServiceImp implements AdminService {
@@ -31,6 +32,11 @@ public class AdminServiceImp implements AdminService {
         stats.setNumOfPosts(postService.getCountPosts());
         stats.setNumOfUsers(userService.getCountUsers());
         return stats;
+    }
+
+    @Override
+    public Integer getUserPostsCount(Long userId) throws UserNotFoundException {
+        return userDAO.getUserPostsCount(userId);
     }
 
 }

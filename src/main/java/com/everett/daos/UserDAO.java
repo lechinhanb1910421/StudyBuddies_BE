@@ -84,4 +84,10 @@ public class UserDAO {
         }
         return count;
     }
+
+    public Integer getUserPostsCount(Long userId) throws UserNotFoundException {
+        User user = getUserById(userId);
+        return user.getPosts().size();
+
+    }
 }
