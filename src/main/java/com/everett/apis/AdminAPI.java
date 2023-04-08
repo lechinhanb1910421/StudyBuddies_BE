@@ -4,6 +4,7 @@ import javax.annotation.security.DenyAll;
 import javax.annotation.security.RolesAllowed;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -15,6 +16,7 @@ import javax.ws.rs.core.Response;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import com.everett.exceptions.checkedExceptions.EmptyEntityException;
 import com.everett.exceptions.checkedExceptions.UserNotFoundException;
 import com.everett.models.Message;
 import com.everett.services.AdminService;
@@ -63,6 +65,22 @@ public class AdminAPI {
     public Response getBriefStats() {
         logger.info("GET ALL STATS FROM ADMIN");
         return Response.ok(adminService.getBriefStats()).build();
+    }
+
+    @Path("/posts/{postId}")
+    @DELETE
+    @RolesAllowed("admin")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response deletePostById(@PathParam("postId") Long postId) {
+        try {
+            logger.info("DELETE POST WITH ID: " + postId + " BY  ADMIN");
+            adminService.deletePostById(postId);
+            Message message = new Message("Post was successfully deleted by admin");
+            return Response.ok(message).build();
+        } catch (EmptyEntityException e) {
+            Message message = new Message("Post with id " + postId + " not found");
+            throw new WebApplicationException(Response.status(400).entity(message).build());
+        }
     }
 
 }
