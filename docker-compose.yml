@@ -41,6 +41,7 @@ services:
     volumes:
       - './:/src'
       - 'server:/opt/jboss/wildfly/standalone/log'
+      - './keys:/opt/jboss/wildfly/standalone/configuration/keys'
     networks:
       - nlcntt-network
 networks:
