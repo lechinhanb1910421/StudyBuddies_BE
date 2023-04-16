@@ -33,14 +33,19 @@ public class CommentServiceImp implements CommentService {
     @Inject
     CommentDAO commentDAO;
 
+    @Inject
+    NotificationService notificationService;
+
     @Override
     public void addComment(Long postId, String content, String email) {
         try {
             Post post = postService.getPostById(postId);
-            User user = userService.getUserByEmail(email);
+            User commenterUser = userService.getUserByEmail(email);
             Timestamp createdTime = Timestamp.from(Instant.now().truncatedTo(ChronoUnit.SECONDS));
-            Comment comment = new Comment(post, user, createdTime, content);
+            Comment comment = new Comment(post, commenterUser, createdTime, content);
             commentDAO.addComment(comment);
+           
+            notificationService.sendCommentAddedMessage(post.getOwnerUser(), postId, commenterUser);
         } catch (UserNotFoundException e) {
             Message msg = new Message("User with email " + email + " does not exist");
             throw new WebApplicationException(Response.status(400).entity(msg).build());

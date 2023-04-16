@@ -63,6 +63,10 @@ public class User {
     @OneToMany(mappedBy = "user", targetEntity = Comment.class, fetch = FetchType.LAZY, orphanRemoval = true, cascade = CascadeType.REMOVE)
     private Set<Comment> comments = new HashSet<Comment>();
 
+    @JsonIgnore
+    @OneToMany(mappedBy = "user", targetEntity = Device.class, fetch = FetchType.LAZY, orphanRemoval = true, cascade = CascadeType.ALL)
+    private Set<Device> devices = new HashSet<>();
+
     public User() {
     }
 
@@ -186,6 +190,14 @@ public class User {
 
     public void removeAllPic() {
         this.avatars.clear();
+    }
+
+    public Set<Device> getDevices() {
+        return devices;
+    }
+
+    public void setDevices(Set<Device> devices) {
+        this.devices = devices;
     }
 
 }

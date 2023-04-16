@@ -136,31 +136,11 @@ limitations under the License.
             <version>1.1</version>
             <scope>provided</scope>
         </dependency>
-         <!-- <dependency>
+         <dependency>
             <groupId>com.google.firebase</groupId>
             <artifactId>firebase-admin</artifactId>
             <version>8.1.0</version>
-        </dependency> -->
-
-        <!-- <dependency>
-            <groupId>org.keycloak</groupId>
-            <artifactId>keycloak-core</artifactId>
-            <version>20.0.3</version>
-            <scope>provided</scope>
-        </dependency> -->
-        <!-- https://mvnrepository.com/artifact/org.keycloak/keycloak-adapter-core -->
-        <!-- <dependency>
-            <groupId>org.keycloak</groupId>
-            <artifactId>keycloak-adapter-core</artifactId>
-            <version>20.0.3</version>
-            <scope>provided</scope>
-        </dependency> -->
-        <!-- <dependency>
-            <groupId>org.keycloak</groupId>
-            <artifactId>keycloak-adapter-spi</artifactId>
-            <version>20.0.3</version>
-            <scope>provided</scope>
-        </dependency> -->
+        </dependency>
 
         <!-- Dependency for Hibernate  search -->
         <dependency>
