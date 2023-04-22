@@ -64,7 +64,7 @@ public class Device {
 
     @Override
     public String toString() {
-        return "Device [deviceId=" + deviceId + ", user=" + user + ", fcmToken=" + fcmToken + "]";
+        return "Device [deviceId=" + deviceId + ", fcmToken=" + fcmToken + "]";
     }
 
     

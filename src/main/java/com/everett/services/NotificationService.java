@@ -37,6 +37,9 @@ public class NotificationService {
 
     @TransactionAttribute(TransactionAttributeType.REQUIRED)
     public void sendCommentAddedMessage(User postOwner, Long postId, User commenter) {
+        if(postOwner.getUserId() == commenter.getUserId()){
+            return;
+        }
         String commenterName = commenter.getGivenName() + " " + commenter.getFamilyName();
         String commenterAvatar = commenter.getAvatars().iterator().next().getAvaUrl();
         if (commenterAvatar == "") {

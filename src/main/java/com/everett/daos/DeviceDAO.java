@@ -54,6 +54,7 @@ public class DeviceDAO {
                     Device.class);
             device = query.setParameter("fcmToken", token).getSingleResult();
         } catch (NoResultException e) {
+            System.out.println("CAN NOT FIND DEVICE");
             throw new DeviceNotFoundException();
         }
         return device;

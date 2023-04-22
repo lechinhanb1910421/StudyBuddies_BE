@@ -79,7 +79,7 @@ public class NotificationAPI {
         logger.info("DELETE DEVICE WITH ID: " + deviceId);
         try {
             deviceService.deleteDeviceById(deviceId);
-            Message message = new Message("Device with ID: " + deviceId + "was deleted successfully");
+            Message message = new Message("Device with ID: " + deviceId + " was deleted successfully");
             return Response.ok(message).build();
         } catch (DeviceNotFoundException e) {
             logger.error("DEVICE WITH ID: " + deviceId + " NOT FOUND");
