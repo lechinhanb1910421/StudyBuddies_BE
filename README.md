@@ -18,3 +18,4 @@ in [Dockerfile](Dockerfile) (at line 13).
 2. **Firebase Cloud Messaging for Push Notification** \
 Register a new Firebase App at [Firebase](https://firebase.google.com/) and paste the configuration file into [firebaseAccountKey file](keys/firebaseAccountKey.example.json) and **rename it to "firebaseAccountKey.json"**
 3. Feel free to change configs in [Log4j Config File for Runtime](src/main/resources/log4j2.xml) and [Log4j Config File for Build time](src/test/resources/log4j2.xml) as you pleased.
+Change sth
