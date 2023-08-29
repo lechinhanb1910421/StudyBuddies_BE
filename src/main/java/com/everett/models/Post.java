@@ -31,21 +31,21 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
-@Entity(name = "Posts")
-@Table(name = "Posts", schema = "PUBLIC")
+@Entity(name = "posts")
+@Table(name = "posts", schema = "PUBLIC")
 @Indexed
 public class Post {
     @Id
     @DocumentId
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "postId", nullable = false)
+    @Column(name = "post_id", nullable = false)
     private Long postId;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "userId", nullable = false)
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @Column(name = "createdTime", nullable = false)
+    @Column(name = "created_time", nullable = false)
     @JsonDeserialize(using = TimestampDeserializer.class)
     @JsonSerialize(using = TimestampSerializer.class)
     private Timestamp createdTime;
@@ -54,17 +54,17 @@ public class Post {
     @Field(index = Index.YES, store = Store.NO)
     private String content;
 
-    @Column(name = "audienceMode", nullable = false)
+    @Column(name = "audience_mode", nullable = false)
     private String audienceMode;
 
     @IndexedEmbedded
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "topicId", nullable = false)
+    @JoinColumn(name = "topic_id", nullable = false)
     private Topic topic;
 
     @IndexedEmbedded
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "majorId", nullable = false)
+    @JoinColumn(name = "major_id", nullable = false)
     private Major major;
 
     @ManyToMany(fetch = FetchType.LAZY)

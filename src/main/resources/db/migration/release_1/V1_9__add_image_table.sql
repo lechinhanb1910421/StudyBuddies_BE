@@ -1,12 +1,12 @@
-CREATE TABLE IF NOT EXISTS PUBLIC.Pictures (
-    picId BIGSERIAL NOT NULL,
-    picUrl TEXT NOT NULL,
-    postId BIGINT NOT NULL,
-    PRIMARY KEY (picId)
+CREATE TABLE IF NOT EXISTS PUBLIC.pictures (
+    pic_id BIGSERIAL NOT NULL,
+    pic_url TEXT,
+    post_id BIGINT,
+    PRIMARY KEY (pic_id)
 );
 
-INSERT INTO public.Pictures (picUrl, postId)
+INSERT INTO PUBLIC.pictures (pic_url, post_id)
 VALUES ('../assets/Ganyu_2.jpeg', 1);
 
-ALTER TABLE PUBLIC.Pictures 
-ADD CONSTRAINT postId FOREIGN KEY (postId) REFERENCES PUBLIC.Posts (postId);
+ALTER TABLE PUBLIC.pictures 
+ADD CONSTRAINT post_id FOREIGN KEY (post_id) REFERENCES PUBLIC.posts (post_id);

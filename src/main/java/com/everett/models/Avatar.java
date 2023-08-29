@@ -12,19 +12,19 @@ import javax.persistence.Table;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-@Entity(name = "Avatars")
-@Table(name = "Avatars", schema = "PUBLIC")
+@Entity(name = "avatars")
+@Table(name = "avatars", schema = "PUBLIC")
 public class Avatar {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "avaId", nullable = false)
+    @Column(name = "ava_id", nullable = false)
     private Long avaId;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "userId")
+    @JoinColumn(name = "user_id")
     private User user;
 
-    @Column(name = "avaUrl", nullable = false)
+    @Column(name = "ava_url", nullable = false)
     private String avaUrl;
 
     public Avatar() {

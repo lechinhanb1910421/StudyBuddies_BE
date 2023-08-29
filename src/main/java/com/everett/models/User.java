@@ -22,33 +22,33 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
-@Entity(name = "Users")
-@Table(name = "Users", schema = "PUBLIC")
+@Entity(name = "users")
+@Table(name = "users", schema = "PUBLIC")
 @JsonIgnoreProperties({ "hibernateLazyInitializer", "handler" })
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "userId", nullable = false)
+    @Column(name = "user_id", nullable = false)
     private Long userId;
 
-    @Column(name = "loginName", nullable = false)
+    @Column(name = "login_name", nullable = false)
     private String loginName;
 
-    @Column(name = "givenName", nullable = false)
+    @Column(name = "given_name", nullable = false)
     private String givenName;
 
-    @Column(name = "familyName", nullable = false)
+    @Column(name = "family_name", nullable = false)
     private String familyName;
 
     @Column(name = "email", nullable = false)
     private String email;
 
-    @Column(name = "createdDate", nullable = false)
+    @Column(name = "created_date", nullable = false)
     @JsonDeserialize(using = TimestampDeserializer.class)
     @JsonSerialize(using = TimestampSerializer.class)
     private Timestamp createdDate;
 
-    @Column(name = "accountStatus", nullable = false)
+    @Column(name = "account_status", nullable = false)
     private String accountStatus;
 
     @OneToMany(mappedBy = "user", targetEntity = Avatar.class, orphanRemoval = true, cascade = CascadeType.ALL)
