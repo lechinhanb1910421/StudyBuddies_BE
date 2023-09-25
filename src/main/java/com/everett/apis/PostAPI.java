@@ -1,5 +1,6 @@
 package com.everett.apis;
 
+import javax.annotation.security.RolesAllowed;
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
 import javax.ws.rs.Consumes;
@@ -32,6 +33,7 @@ import com.everett.services.PostService;
 
 @Path("/posts")
 @RequestScoped
+@RolesAllowed({ "admin", "visitor" })
 public class PostAPI {
     private static final Logger logger = LogManager.getLogger(PostAPI.class);
 
@@ -67,7 +69,8 @@ public class PostAPI {
     @GET
     @Path("/search")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response seachRequestsByReason(@QueryParam("keywords") String keywords, @QueryParam("topicId") Long topicId, @QueryParam("majorId") Long majorId){
+    public Response seachRequestsByReason(@QueryParam("keywords") String keywords, @QueryParam("topicId") Long topicId,
+            @QueryParam("majorId") Long majorId) {
         if (keywords == null) {
             throw new InvalidSearchKeywordException("Keyword must not be null");
         }

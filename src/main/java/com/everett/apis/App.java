@@ -7,7 +7,7 @@ import javax.ws.rs.core.Application;
 import org.eclipse.microprofile.auth.LoginConfig;
 
 @ApplicationPath("/api")
-@LoginConfig(authMethod = "MP-JWT", realmName = "nlcntt")
+@LoginConfig(authMethod = "MP-JWT", realmName = "LVCNTT")
 @DeclareRoles({ "admin", "visitor" })
 public class App extends Application {
 

@@ -1,8 +1,8 @@
-CREATE TABLE IF NOT EXISTS PUBLIC.posts (
-    post_id BIGSERIAL NOT NULL,
-    user_id BIGINT,
-    created_time TIMESTAMP WITH TIME ZONE,
+CREATE TABLE IF NOT EXISTS PUBLIC.Posts (
+    postId BIGSERIAL NOT NULL,
+    userId BIGINT,
+    createdTime TIMESTAMP WITH TIME ZONE,
     content TEXT,
-    audience_mode VARCHAR(45),
-    PRIMARY KEY (post_id)
+    audienceMode VARCHAR(45),
+    PRIMARY KEY (postId)
 );

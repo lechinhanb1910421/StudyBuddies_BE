@@ -2,6 +2,7 @@ package com.everett.services;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import javax.ejb.Stateless;
 import javax.ejb.TransactionAttribute;
@@ -71,10 +72,12 @@ public class UserServiceImp implements UserService {
     }
 
     @Override
+    @TransactionAttribute(TransactionAttributeType.REQUIRED)
     public void addUserAvatar(String userEmail, Avatar avatar) throws UserNotFoundException {
         User user = userDAO.getUserByEmail(userEmail);
-        user.removeAllPic();
-        user.setAvatar(avatar);
+        Set<Avatar> avatars = user.getAvatars();
+        findAndUnsetCurrentActiveAvatar(avatars);
+        avatars.add(avatar);
         userDAO.updateUser(user);
     }
 
@@ -86,5 +89,13 @@ public class UserServiceImp implements UserService {
     @Override
     public Long getCountUsers() {
         return userDAO.getCountUsers();
+    }
+
+    private void findAndUnsetCurrentActiveAvatar(Set<Avatar> avatars) {
+        for (Avatar avatar : avatars) {
+            if (avatar.isActive()) {
+                avatar.setActive(false);
+            }
+        }
     }
 }

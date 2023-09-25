@@ -53,7 +53,7 @@ public class CommentAPI {
     public Response addComment(@PathParam("postId") Long postId, @QueryParam("content") String content) {
         try {
             commentService.addComment(postId, content, email);
-            logger.info("COMMENT" + postId + ", CONTENT: " + content + " WAS SUCCESSFULLY ADDED");
+            logger.info("COMMENT TO POST ID: " + postId + ", CONTENT: []" + content + "] WAS SUCCESSFULLY ADDED");
             Message message = new Message("Comment was successfully added");
             return Response.ok(message).build();
         } catch (Exception e) {

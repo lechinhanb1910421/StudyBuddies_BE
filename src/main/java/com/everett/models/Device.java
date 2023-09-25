@@ -12,21 +12,21 @@ import javax.persistence.Table;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-@Entity(name = "devices")
-@Table(name = "devices", schema = "PUBLIC")
+@Entity(name = "Devices")
+@Table(name = "Devices", schema = "PUBLIC")
 public class Device {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "device_id")
+    @Column(name = "deviceId")
     private Long deviceId;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
+    @JoinColumn(name = "userId", nullable = false)
     @JsonIgnore
     private User user;
 
-    @Column(name = "fcm_token")
+    @Column(name = "fcmToken")
     private String fcmToken;
 
     public Device() {

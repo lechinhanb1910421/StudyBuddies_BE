@@ -13,23 +13,23 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
-@Entity(name = "comments")
-@Table(name = "comments", schema = "PUBLIC")
+@Entity(name = "Comments")
+@Table(name = "Comments", schema = "PUBLIC")
 public class Comment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "comment_id", nullable = false)
+    @Column(name = "commentId", nullable = false)
     private Long commentId;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "post_id", nullable = false)
+    @JoinColumn(name = "postId", nullable = false)
     private Post post;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
+    @JoinColumn(name = "userId", nullable = false)
     private User user;
 
-    @Column(name = "created_time", nullable = false)
+    @Column(name = "createdTime", nullable = false)
     private Timestamp createdTime;
 
     @Column(name = "content", nullable = false)

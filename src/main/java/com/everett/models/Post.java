@@ -31,21 +31,21 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
-@Entity(name = "posts")
-@Table(name = "posts", schema = "PUBLIC")
+@Entity(name = "Posts")
+@Table(name = "Posts", schema = "PUBLIC")
 @Indexed
 public class Post {
     @Id
     @DocumentId
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "post_id", nullable = false)
+    @Column(name = "postId", nullable = false)
     private Long postId;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
+    @JoinColumn(name = "userId", nullable = false)
     private User user;
 
-    @Column(name = "created_time", nullable = false)
+    @Column(name = "createdTime", nullable = false)
     @JsonDeserialize(using = TimestampDeserializer.class)
     @JsonSerialize(using = TimestampSerializer.class)
     private Timestamp createdTime;
@@ -54,21 +54,21 @@ public class Post {
     @Field(index = Index.YES, store = Store.NO)
     private String content;
 
-    @Column(name = "audience_mode", nullable = false)
+    @Column(name = "audienceMode", nullable = false)
     private String audienceMode;
 
     @IndexedEmbedded
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "topic_id", nullable = false)
+    @JoinColumn(name = "topicId", nullable = false)
     private Topic topic;
 
     @IndexedEmbedded
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "major_id", nullable = false)
+    @JoinColumn(name = "majorId", nullable = false)
     private Major major;
 
     @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(name = "post_reaction", joinColumns = {
+    @JoinTable(name = "Post_reaction", joinColumns = {
             @JoinColumn(name = "postId", nullable = false, updatable = false) }, inverseJoinColumns = {
                     @JoinColumn(name = "userId", nullable = false, updatable = false) })
     private Set<User> reactions = new HashSet<User>();

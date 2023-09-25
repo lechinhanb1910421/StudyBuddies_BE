@@ -12,20 +12,23 @@ import javax.persistence.Table;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-@Entity(name = "avatars")
-@Table(name = "avatars", schema = "PUBLIC")
+@Entity(name = "Avatars")
+@Table(name = "Avatars", schema = "PUBLIC")
 public class Avatar {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "ava_id", nullable = false)
+    @Column(name = "avaId", nullable = false)
     private Long avaId;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "userId")
     private User user;
 
-    @Column(name = "ava_url", nullable = false)
+    @Column(name = "avaUrl", nullable = false)
     private String avaUrl;
+
+    @Column(name = "isActive")
+    private boolean isActive;
 
     public Avatar() {
     }
@@ -36,7 +39,7 @@ public class Avatar {
 
     @Override
     public String toString() {
-        return "Avatar [avaId=" + avaId + ", avaUrl=" + avaUrl + "]";
+        return "Avatar [avaId=" + avaId + ", user=" + user + ", avaUrl=" + avaUrl + ", isActive=" + isActive + "]";
     }
 
     public Long getAvaId() {
@@ -62,6 +65,14 @@ public class Avatar {
 
     public void setAvaUrl(String avaUrl) {
         this.avaUrl = avaUrl;
+    }
+
+    public boolean isActive() {
+        return isActive;
+    }
+
+    public void setActive(boolean isActive) {
+        this.isActive = isActive;
     }
 
 }

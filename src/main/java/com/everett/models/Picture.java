@@ -10,19 +10,19 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
-@Entity(name = "pictures")
-@Table(name = "pictures", schema = "PUBLIC")
+@Entity(name = "Pictures")
+@Table(name = "Pictures", schema = "PUBLIC")
 public class Picture {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "pic_id", nullable = false)
+    @Column(name = "picId", nullable = false)
     private Long picId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "postId")
     private Post post;
 
-    @Column(name = "pic_url", nullable = false)
+    @Column(name = "picUrl", nullable = false)
     private String picUrl;
 
     public Picture() {

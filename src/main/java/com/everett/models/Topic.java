@@ -17,18 +17,18 @@ import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.FieldBridge;
 import org.hibernate.search.bridge.builtin.LongBridge;
 
-@Entity(name = "topics")
-@Table(name = "topics", schema = "PUBLIC")
+@Entity(name = "Topics")
+@Table(name = "Topics", schema = "PUBLIC")
 public class Topic {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "topic_id", nullable = false)
+    @Column(name = "topicId", nullable = false)
     private Long topicId;
 
-    @Column(name = "topic_name", nullable = false)
+    @Column(name = "topicName", nullable = false)
     private String topicName;
 
-    @Column(name = "topic_description", nullable = false)
+    @Column(name = "topicDescription", nullable = false)
     private String topicDescription;
 
     @Column(name = "followers", nullable = false)

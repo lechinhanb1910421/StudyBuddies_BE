@@ -6,13 +6,13 @@ services:
     env_file:
       - ./.env
     ports:
-      - '$KC_HOST_PORT:$KC_CONTAINER_PORT'
+      - '8027:8080'
     command: start-dev
     networks:
       - nlcntt-network
     restart: unless-stopped
     volumes:
-      - keycloak:$KC_VOLUME_DIR
+      - keycloak:/opt/keycloak/data/
     depends_on:
       - db
   db:
