@@ -4,3 +4,4 @@ maven_build.bat
 build_and_deploy.bat
 .env
 keys/firebaseAccountKey.json
+quick_deploy.bat
