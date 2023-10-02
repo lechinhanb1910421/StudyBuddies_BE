@@ -76,9 +76,15 @@ public class UserServiceImp implements UserService {
     public void addUserAvatar(String userEmail, Avatar avatar) throws UserNotFoundException {
         User user = userDAO.getUserByEmail(userEmail);
         Set<Avatar> avatars = user.getAvatars();
-        findAndUnsetCurrentActiveAvatar(avatars);
+        setActiveAvtarForUser(avatars, avatar, user);
         avatars.add(avatar);
         userDAO.updateUser(user);
+    }
+
+    private void setActiveAvtarForUser(Set<Avatar> currentAvatars, Avatar newAvatar, User user) {
+        findAndUnsetCurrentActiveAvatar(currentAvatars);
+        newAvatar.setActive(1);
+        newAvatar.setUser(user);
     }
 
     @Override
@@ -93,8 +99,8 @@ public class UserServiceImp implements UserService {
 
     private void findAndUnsetCurrentActiveAvatar(Set<Avatar> avatars) {
         for (Avatar avatar : avatars) {
-            if (avatar.isActive()) {
-                avatar.setActive(false);
+            if (avatar.getIsActive() == 1) {
+                avatar.setActive(0);
             }
         }
     }

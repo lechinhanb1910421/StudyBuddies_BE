@@ -28,13 +28,14 @@ public class Avatar {
     private String avaUrl;
 
     @Column(name = "isActive")
-    private boolean isActive;
+    private int isActive;
 
     public Avatar() {
     }
 
     public Avatar(String avaUrl) {
         this.avaUrl = avaUrl;
+        this.isActive = 1;
     }
 
     @Override
@@ -67,11 +68,11 @@ public class Avatar {
         this.avaUrl = avaUrl;
     }
 
-    public boolean isActive() {
+    public int getIsActive() {
         return isActive;
     }
 
-    public void setActive(boolean isActive) {
+    public void setActive(int isActive) {
         this.isActive = isActive;
     }
 
