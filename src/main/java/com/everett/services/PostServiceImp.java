@@ -4,7 +4,10 @@ import java.sql.Timestamp;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 import javax.ejb.Stateless;
@@ -35,6 +38,7 @@ import com.everett.exceptions.checkedExceptions.UserNotFoundException;
 import com.everett.exceptions.webExceptions.InternalServerError;
 import com.everett.exceptions.webExceptions.MajorNotFoundWebException;
 import com.everett.exceptions.webExceptions.TopicNotFoundWebException;
+import com.everett.models.Avatar;
 import com.everett.models.Comment;
 import com.everett.models.Major;
 import com.everett.models.Picture;
@@ -45,6 +49,7 @@ import com.everett.models.User;
 @Stateless
 public class PostServiceImp implements PostService {
     private static final Logger logger = LogManager.getLogger(PostService.class);
+    private static final int AVATAR_AVTICE = 1;
     @Inject
     PostDAO postDAO;
 
@@ -280,23 +285,40 @@ public class PostServiceImp implements PostService {
     @TransactionAttribute(TransactionAttributeType.REQUIRED)
     public List<CommentResponseDTO> getCommentsByPostId(Long postId)
             throws EmptyCommentException, EmptyEntityException {
-        // Post post = postDAO.getPostById(postId);
-        // Set<Comment> comments = new HashSet<Comment>(post.getCommentUser());
         List<Comment> comments = commentDAO.getCommentsByPostId(postId);
         if (comments.size() == 0) {
             throw new EmptyCommentException();
         }
         List<CommentResponseDTO> results = new ArrayList<CommentResponseDTO>();
         comments.forEach((elem) -> {
-            results.add(new CommentResponseDTO(elem));
+            CommentResponseDTO cmtDTO = new CommentResponseDTO(elem);
+            cmtDTO.setUserAvatarUrl(getUserCurrentActiveAvatarFromComment(elem));
+            results.add(cmtDTO);
+
         });
         return results;
 
     }
 
     @Override
-    public Long getCountPosts(){
+    public Long getCountPosts() {
         return postDAO.getCountPosts();
+    }
+
+    private String getUserCurrentActiveAvatarFromComment(Comment comment) {
+        Iterator<Avatar> avatarIter = Optional.ofNullable(comment)
+                .map(Comment::getUser)
+                .map(User::getAvatars)
+                .orElse(new HashSet<Avatar>())
+                .iterator();
+
+        while (avatarIter.hasNext()) {
+            Avatar avatar = avatarIter.next();
+            if (avatar.getIsActive() == AVATAR_AVTICE) {
+                return avatar.getAvaUrl();
+            }
+        }
+        return "";
     }
 
 }

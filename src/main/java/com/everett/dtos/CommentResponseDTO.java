@@ -30,7 +30,6 @@ public class CommentResponseDTO {
         this.userId = comment.getUser().getUserId();
         this.userGivenName = comment.getUser().getGivenName();
         this.userFamilyName = comment.getUser().getFamilyName();
-        this.userAvatarUrl = comment.getUser().getAvatars().iterator().next().getAvaUrl();
         this.userFullName = this.userGivenName + " " + this.userFamilyName;
     }
 
