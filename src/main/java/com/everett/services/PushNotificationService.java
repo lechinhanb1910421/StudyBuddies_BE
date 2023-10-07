@@ -21,7 +21,7 @@ import com.everett.models.User;
 import com.google.firebase.messaging.FirebaseMessagingException;
 
 @Stateless
-public class NotificationService {
+public class PushNotificationService {
     private static final Logger logger = LogManager.getLogger(CommentServiceImp.class);
 
     @Inject
@@ -37,7 +37,7 @@ public class NotificationService {
 
     @TransactionAttribute(TransactionAttributeType.REQUIRED)
     public void sendCommentAddedMessage(User postOwner, Long postId, User commenter) {
-        if(postOwner.getUserId() == commenter.getUserId()){
+        if (postOwner.getUserId() == commenter.getUserId()) {
             return;
         }
         String commenterName = commenter.getGivenName() + " " + commenter.getFamilyName();

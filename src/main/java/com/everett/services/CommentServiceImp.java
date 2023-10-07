@@ -20,6 +20,7 @@ import com.everett.models.Comment;
 import com.everett.models.Message;
 import com.everett.models.Post;
 import com.everett.models.User;
+import com.everett.models.type.NotificationType;
 
 @Stateless
 public class CommentServiceImp implements CommentService {
@@ -34,7 +35,10 @@ public class CommentServiceImp implements CommentService {
     CommentDAO commentDAO;
 
     @Inject
-    NotificationService notificationService;
+    PushNotificationService pushNotificationService;
+
+    @Inject
+    UserNotificationService userNotificationService;
 
     @Override
     public void addComment(Long postId, String content, String email) {
@@ -44,8 +48,9 @@ public class CommentServiceImp implements CommentService {
             Timestamp createdTime = Timestamp.from(Instant.now().truncatedTo(ChronoUnit.SECONDS));
             Comment comment = new Comment(post, commenterUser, createdTime, content);
             commentDAO.addComment(comment);
-           
-            notificationService.sendCommentAddedMessage(post.getOwnerUser(), postId, commenterUser);
+
+            userNotificationService.addNotificationForUser(email, NotificationType.NEW_COMMENT, post);
+            pushNotificationService.sendCommentAddedMessage(post.getOwnerUser(), postId, commenterUser);
         } catch (UserNotFoundException e) {
             Message msg = new Message("User with email " + email + " does not exist");
             throw new WebApplicationException(Response.status(400).entity(msg).build());

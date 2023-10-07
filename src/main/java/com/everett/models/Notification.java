@@ -39,8 +39,8 @@ public class Notification {
     public Notification() {
     }
 
-    public Notification(String content, String notiType, Timestamp createdAt,
-            String referenceLink) {
+    public Notification(User receiver, String content, String notiType, Timestamp createdAt, String referenceLink) {
+        this.receiverUser = receiver;
         this.content = content;
         this.notiType = notiType;
         this.createdAt = createdAt;
@@ -101,7 +101,4 @@ public class Notification {
         this.referenceLink = referenceLink;
     }
 
-    
 }
-
-

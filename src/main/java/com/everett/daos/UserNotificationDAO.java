@@ -18,16 +18,16 @@ public class UserNotificationDAO {
     @PersistenceContext(unitName = "primary")
     EntityManager entityManager;
 
-    public List<Notification> getUserNotificationsById(Long userId) throws EmptyCommentException {
-        logger.info("GET ALL NOTIFICATIONS FOR USER ID: " + userId);
+    public List<Notification> getUserNotificationsByEmail(String email) throws EmptyCommentException {
+        logger.info("GET ALL NOTIFICATIONS FOR USER ID: " + email);
 
         List<Notification> res = null;
         try {
             TypedQuery<Notification> query = entityManager
                     .createQuery(
-                            "FROM Notifications n LEFT JOIN FETCH n.receiverUser u WHERE n.receiverUser.userId = :userId ORDER BY n.createdAt DESC",
+                            "FROM Notifications n LEFT JOIN FETCH n.receiverUser u WHERE n.receiverUser.email = :email ORDER BY n.createdAt DESC",
                             Notification.class);
-            res = query.setParameter("userId", userId).getResultList();
+            res = query.setParameter("email", email).getResultList();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -37,5 +37,13 @@ public class UserNotificationDAO {
             return res;
         }
 
+    }
+
+    public void persistNotfication(Notification notification) {
+        try {
+            entityManager.persist(notification);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }
