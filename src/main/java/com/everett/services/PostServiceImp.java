@@ -45,6 +45,7 @@ import com.everett.models.Picture;
 import com.everett.models.Post;
 import com.everett.models.Topic;
 import com.everett.models.User;
+import com.everett.models.type.NotificationType;
 
 @Stateless
 public class PostServiceImp implements PostService {
@@ -70,6 +71,9 @@ public class PostServiceImp implements PostService {
 
     @Inject
     UserService userService;
+
+    @Inject
+    UserNotificationService userNotificationService;
 
     @Override
     public void createPost(PostReceiveDTO payload, String email) throws UserNotFoundException {
@@ -249,9 +253,12 @@ public class PostServiceImp implements PostService {
     @Override
     public void reactPost(Long id, String email) {
         try {
+            Post post = postDAO.getPostById(id);
             User user = userService.getUserByEmail(email);
+            userNotificationService.addNotificationForUser(email, NotificationType.NEW_REACTION, post);
             postDAO.reactPost(id, user);
-        } catch (UserNotFoundException e) {
+        } catch (UserNotFoundException | EmptyEntityException e) {
+            logger.error("CANNOT REACT POST ", e);
         }
     }
 
