@@ -67,6 +67,9 @@ public class User {
     @OneToMany(mappedBy = "user", targetEntity = Device.class, fetch = FetchType.LAZY, orphanRemoval = true, cascade = CascadeType.ALL)
     private Set<Device> devices = new HashSet<>();
 
+    @OneToMany(mappedBy = "receiverUser", targetEntity = Notification.class, fetch = FetchType.LAZY, orphanRemoval = true, cascade = CascadeType.ALL)
+    private Set<Notification> notifications = new HashSet<Notification>();
+
     public User() {
     }
 
@@ -198,6 +201,14 @@ public class User {
 
     public void setDevices(Set<Device> devices) {
         this.devices = devices;
+    }
+
+    public Set<Notification> getNotifications() {
+        return notifications;
+    }
+
+    public void setNotifications(Set<Notification> notifications) {
+        this.notifications = notifications;
     }
 
 }

@@ -34,6 +34,7 @@ import com.everett.models.Avatar;
 import com.everett.models.Message;
 import com.everett.models.User;
 import com.everett.services.PostService;
+import com.everett.services.UserNotificationService;
 import com.everett.services.UserService;
 
 @Path("/users")
@@ -66,6 +67,9 @@ public class UserAPI {
     @Inject
     @ConfigProperty(name = "default_ava_url")
     private String defaultAvaUrl;
+
+    @Inject
+    private UserNotificationService notificationService;
 
     @Path("/whoami")
     @GET
@@ -191,6 +195,21 @@ public class UserAPI {
         }
         Message message = new Message("Avatar ID: [" + avaId + "] was successfully remove for user:  [" + email + "]");
         return Response.ok(message).build();
+    }
+
+    @Path("/notifications")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @RolesAllowed({ "admin", "visitor" })
+    public Response getUserNotification() {
+        logger.info("GET NOTIFICATION FOR USER EMAIL: [" + email + "]");
+        try {
+            return Response.ok(notificationService.getUserNotificationByEmail(email)).build();
+        } catch (UserNotFoundException e) {
+            logger.error("USER WITH EMAIL " + email + " NOT FOUND");
+            Message errMessage = new Message("User with email " + email + " not found");
+            throw new WebApplicationException(Response.status(400).entity(errMessage).build());
+        }
     }
 
 }
