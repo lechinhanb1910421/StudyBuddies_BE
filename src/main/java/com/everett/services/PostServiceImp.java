@@ -22,6 +22,7 @@ import com.everett.daos.AvatarDAO;
 import com.everett.daos.CommentDAO;
 import com.everett.daos.MajorDAO;
 import com.everett.daos.PostDAO;
+import com.everett.daos.PostTracingDAO;
 import com.everett.daos.TopicDAO;
 import com.everett.daos.UserDAO;
 import com.everett.dtos.CommentResponseDTO;
@@ -43,14 +44,21 @@ import com.everett.models.Comment;
 import com.everett.models.Major;
 import com.everett.models.Picture;
 import com.everett.models.Post;
+import com.everett.models.PostTracing;
 import com.everett.models.Topic;
 import com.everett.models.User;
 import com.everett.models.type.NotificationType;
+import com.everett.models.type.PostTracingType;
 
 @Stateless
 public class PostServiceImp implements PostService {
     private static final Logger logger = LogManager.getLogger(PostService.class);
     private static final int AVATAR_AVTICE = 1;
+    private static final String ADD_POST_MESSASE_TEMPLATE = "User: [%s] email: [%s] create a new post";
+    private static final String UPDATE_POST_MESSASE_TEMPLATE = "User: [%s] email: [%s] update post";
+    private static final String DELETE_POST_MESSASE_TEMPLATE = "User: [%s] email: [%s] delete post";
+    private static final String PICTURE_URL_TEMPLATE = "(%s)[%s] - ";
+
     @Inject
     PostDAO postDAO;
 
@@ -77,6 +85,9 @@ public class PostServiceImp implements PostService {
 
     @Inject
     PushNotificationService pushNotificationService;
+
+    @Inject
+    PostTracingDAO postTracingDAO;
 
     @Override
     public void createPost(PostReceiveDTO payload, String email) throws UserNotFoundException {
@@ -109,8 +120,10 @@ public class PostServiceImp implements PostService {
                 payload.getAudienceMode(), topic, major);
         Picture picture = new Picture(payload.getImageUrl());
         newPost.setPicture(picture);
+
         try {
             postDAO.createPost(newPost);
+            postTracingDAO.createPostTracing(buildPostTracingRecord(newPost, user, PostTracingType.ADD_POST));
         } catch (Exception ex) {
             throw new InternalServerError(ex.getMessage());
         }
@@ -121,8 +134,6 @@ public class PostServiceImp implements PostService {
     public PostResponseDTO getPostResponseById(Long id) throws EmptyEntityException {
         Post post = getPostById(id);
         PostResponseDTO result = new PostResponseDTO(post);
-        // result.setReactsCount(postDAO.getAllPostReactionsCount(id));
-        // result.setCommentsCount(postDAO.getAllPostCommentsCount(id));
         Set<Picture> pictures = post.getPictures();
         pictures.forEach((pic) -> {
             result.setPicUrls(pic.getPicUrl());
@@ -145,8 +156,6 @@ public class PostServiceImp implements PostService {
         List<PostResponseDTO> results = new ArrayList<>();
         for (Post post : postList) {
             PostResponseDTO responseDTO = new PostResponseDTO(post);
-            // responseDTO.setReactsCount(postDAO.getAllPostReactionsCount(post.getPostId()));
-            // responseDTO.setCommentsCount(postDAO.getAllPostCommentsCount(post.getPostId()));
             Set<Picture> pictures = post.getPictures();
             pictures.forEach((pic) -> {
                 responseDTO.setPicUrls(pic.getPicUrl());
@@ -166,6 +175,7 @@ public class PostServiceImp implements PostService {
         if (!owner.getEmail().equals(email) || !owner.getLoginName().equals(loginName)) {
             throw new DeletePostNotAuthorizedException();
         }
+        postTracingDAO.createPostTracing(buildPostTracingRecord(post, owner, PostTracingType.DELETE_POST));
         postDAO.deletePost(id);
     }
 
@@ -174,7 +184,6 @@ public class PostServiceImp implements PostService {
     public void updatePost(Long id, PostReceiveDTO payload) throws EmptyEntityException {
         Post oldPost;
         oldPost = getPostById(id);
-        // oldPost.setPicturesSet(oldPost.getPictures());
         Long majorId = null;
         Long topicId = null;
         String newContent = null;
@@ -215,6 +224,8 @@ public class PostServiceImp implements PostService {
             oldPost.removeAllPic();
             oldPost.setPicture(newPic);
         }
+        postTracingDAO.createPostTracing(
+                buildPostTracingRecord(oldPost, oldPost.getOwnerUser(), PostTracingType.UPDATE_POST));
         postDAO.updatePost(oldPost);
     }
 
@@ -332,4 +343,47 @@ public class PostServiceImp implements PostService {
         return "";
     }
 
+    @TransactionAttribute(TransactionAttributeType.REQUIRED)
+    private PostTracing buildPostTracingRecord(Post post, User user, PostTracingType eventType) {
+        Timestamp createdAt = Timestamp.from(Instant.now().truncatedTo(ChronoUnit.SECONDS));
+        String tracingMessage = buildTracingMessage(user, eventType);
+        String tracingPictures = buildPictureUrls(post, eventType);
+        String postContent = eventType == PostTracingType.DELETE_POST ? "" : post.getContent();
+        return new PostTracing(user.getUserId(), user.getEmail(), post.getPostId(), eventType, tracingMessage,
+                tracingPictures, postContent, createdAt, post.getTopic().getTopicId(), post.getMajor().getMajorId());
+    }
+
+    private String buildPictureUrls(Post post, PostTracingType eventType) {
+        if (eventType == PostTracingType.DELETE_POST) {
+            return "";
+        }
+        int count = 1;
+        String result = "Picture url: ";
+        Set<Picture> pictures = post.getPictures();
+        if (pictures == null || pictures.size() == 0) {
+            return result.concat("[]");
+        }
+        Iterator<Picture> picIter = pictures.iterator();
+
+        while (picIter.hasNext()) {
+            Picture pic = picIter.next();
+            result = result.concat(String.format(PICTURE_URL_TEMPLATE, count, pic.getPicUrl()));
+            count++;
+        }
+        return result;
+    }
+
+    private String buildTracingMessage(User user, PostTracingType eventType) {
+        String userName = user.getGivenName() + " " + user.getFamilyName();
+        switch (eventType) {
+            case ADD_POST:
+                return String.format(ADD_POST_MESSASE_TEMPLATE, userName, user.getEmail());
+            case UPDATE_POST:
+                return String.format(UPDATE_POST_MESSASE_TEMPLATE, userName, user.getEmail());
+            case DELETE_POST:
+                return String.format(DELETE_POST_MESSASE_TEMPLATE, userName, user.getEmail());
+            default:
+                return "CANNOT BUILD TRACING MESSAGE";
+        }
+    }
 }

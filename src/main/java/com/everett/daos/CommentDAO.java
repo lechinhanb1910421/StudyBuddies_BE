@@ -70,13 +70,8 @@ public class CommentDAO {
         }
     }
 
-    public void deleteComment(Long cmtId) throws CommentNotFoundException {
-        logger.info("DELETE CMT WITH ID: " + cmtId);
-        Comment comment = entityManager.find(Comment.class, cmtId);
-        if (comment == null) {
-            throw new CommentNotFoundException();
-        } else {
-            entityManager.remove(comment);
-        }
+    public void deleteComment(Comment comment) {
+        logger.info("DELETE CMT WITH ID: " + comment.getCommentId());
+        entityManager.remove(comment);
     }
 }
