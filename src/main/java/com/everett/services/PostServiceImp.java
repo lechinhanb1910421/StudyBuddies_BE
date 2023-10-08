@@ -75,6 +75,9 @@ public class PostServiceImp implements PostService {
     @Inject
     UserNotificationService userNotificationService;
 
+    @Inject
+    PushNotificationService pushNotificationService;
+
     @Override
     public void createPost(PostReceiveDTO payload, String email) throws UserNotFoundException {
         Timestamp createdTime = Timestamp.from(Instant.now().truncatedTo(ChronoUnit.SECONDS));
@@ -256,6 +259,7 @@ public class PostServiceImp implements PostService {
             Post post = postDAO.getPostById(id);
             User user = userService.getUserByEmail(email);
             userNotificationService.addNotificationForUser(email, NotificationType.NEW_REACTION, post);
+            pushNotificationService.sendReactionAddedMessage(post.getOwnerUser(), post.getPostId(), user);
             postDAO.reactPost(id, user);
         } catch (UserNotFoundException | EmptyEntityException e) {
             logger.error("CANNOT REACT POST ", e);
