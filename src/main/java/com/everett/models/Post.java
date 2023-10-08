@@ -79,9 +79,6 @@ public class Post {
     @OneToMany(mappedBy = "post", targetEntity = Picture.class, orphanRemoval = true, cascade = CascadeType.ALL)
     private Set<Picture> pictures = new HashSet<Picture>();
 
-    @OneToMany(mappedBy = "post", targetEntity = PostTracing.class, fetch = FetchType.LAZY, orphanRemoval = true)
-    private Set<PostTracing> tracingRecords = new HashSet<PostTracing>();
-    
     public Post() {
     }
 
@@ -197,14 +194,6 @@ public class Post {
     public void unsetPicture(Picture picture) {
         this.pictures.remove(picture);
         picture.setPost(null);
-    }
-
-    public Set<PostTracing> getTracingRecords() {
-        return tracingRecords;
-    }
-
-    public void setTracingRecords(Set<PostTracing> tracingRecords) {
-        this.tracingRecords = tracingRecords;
     }
 
 }

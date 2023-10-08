@@ -6,7 +6,7 @@ CREATE TABLE IF NOT EXISTS PUBLIC.Pictures (
 );
 
 INSERT INTO PUBLIC.Pictures (picUrl, postId)
-VALUES ('../assets/Ganyu_2.jpeg', 1);
+VALUES ('../pics/Ganyu_1.jpeg', 1);
 
 ALTER TABLE PUBLIC.Pictures 
 ADD CONSTRAINT postId FOREIGN KEY (postId) REFERENCES PUBLIC.Posts (postId);

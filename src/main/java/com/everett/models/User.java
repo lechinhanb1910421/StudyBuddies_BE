@@ -70,9 +70,6 @@ public class User {
     @OneToMany(mappedBy = "receiverUser", targetEntity = Notification.class, fetch = FetchType.LAZY, orphanRemoval = true, cascade = CascadeType.ALL)
     private Set<Notification> notifications = new HashSet<Notification>();
 
-    @OneToMany(mappedBy = "user", targetEntity = PostTracing.class, fetch = FetchType.LAZY, orphanRemoval = true)
-    private Set<PostTracing> tracingRecords = new HashSet<PostTracing>();
-    
     public User() {
     }
 
@@ -212,14 +209,6 @@ public class User {
 
     public void setNotifications(Set<Notification> notifications) {
         this.notifications = notifications;
-    }
-    
-    public Set<PostTracing> getTracingRecords() {
-        return tracingRecords;
-    }
-
-    public void setTracingRecords(Set<PostTracing> tracingRecords) {
-        this.tracingRecords = tracingRecords;
     }
 
 }

@@ -347,21 +347,16 @@ public class PostServiceImp implements PostService {
     private PostTracing buildPostTracingRecord(Post post, User user, PostTracingType eventType) {
         Timestamp createdAt = Timestamp.from(Instant.now().truncatedTo(ChronoUnit.SECONDS));
         String tracingMessage = buildTracingMessage(user, eventType);
-        String tracingPictures = buildPictureUrls(post);
-        String postContent;
-        switch (eventType) {
-            case DELETE_POST:
-                postContent = "";
-                return new PostTracing(user, post, eventType, tracingMessage, "",
-                        postContent, createdAt, -1L, -1L);
-            default:
-                postContent = post.getContent();
-                return new PostTracing(user, post, eventType, tracingMessage, tracingPictures,
-                        postContent, createdAt, post.getTopic().getTopicId(), post.getMajor().getMajorId());
-        }
+        String tracingPictures = buildPictureUrls(post, eventType);
+        String postContent = eventType == PostTracingType.DELETE_POST ? "" : post.getContent();
+        return new PostTracing(user.getUserId(), user.getEmail(), post.getPostId(), eventType, tracingMessage,
+                tracingPictures, postContent, createdAt, post.getTopic().getTopicId(), post.getMajor().getMajorId());
     }
 
-    private String buildPictureUrls(Post post) {
+    private String buildPictureUrls(Post post, PostTracingType eventType) {
+        if (eventType == PostTracingType.DELETE_POST) {
+            return "";
+        }
         int count = 1;
         String result = "Picture url: ";
         Set<Picture> pictures = post.getPictures();

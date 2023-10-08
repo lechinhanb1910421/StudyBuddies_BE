@@ -1,5 +1,0 @@
-ALTER TABLE PUBLIC.Post_tracing
-ADD COLUMN topicId INT;
-
-ALTER TABLE PUBLIC.Post_tracing
-ADD COLUMN majorId INT;
