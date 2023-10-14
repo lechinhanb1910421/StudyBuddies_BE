@@ -1,6 +1,7 @@
 CREATE TABLE PUBLIC.Notifications (
     notiId BIGSERIAL NOT NULL,
-    receiverId BIGINT NOT NULL,
+    sourceUserId BIGINT NOT NULL,
+    receiveUserId BIGINT NOT NULL,
     content TEXT,
     notiType VARCHAR(100),
     createdAt TIMESTAMP WITH TIME ZONE,
@@ -9,5 +10,5 @@ CREATE TABLE PUBLIC.Notifications (
 );
 
 ALTER TABLE PUBLIC.Notifications
-ADD CONSTRAINT receiver_user_id_fk FOREIGN KEY (receiverId) REFERENCES Users (userId);
+ADD CONSTRAINT receive_user_id_fk FOREIGN KEY (receiveUserId) REFERENCES Users (userId);
 

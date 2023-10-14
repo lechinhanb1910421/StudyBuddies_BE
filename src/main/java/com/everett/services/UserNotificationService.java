@@ -31,8 +31,8 @@ import com.everett.models.type.NotificationType;
 
 @Stateless
 public class UserNotificationService {
-    private static final String NOTIFY_CMT_MSG_TEMPLATE = "%s just left a comment on your post";
-    private static final String NOTIFY_REACT_MSG_TEMPLATE = "%s just reacted your post";
+    private static final String NOTIFY_CMT_MSG_TEMPLATE = "%s left a comment on your post";
+    private static final String NOTIFY_REACT_MSG_TEMPLATE = "%s reacted your post";
     private static final String NOTIFY_REFERENCE_LINK = "http://localhost/post/%s";
     private static final Logger logger = LogManager.getLogger(UserNotificationService.class);
 
@@ -53,11 +53,8 @@ public class UserNotificationService {
         try {
             List<Notification> notifications = notificationDAO.getUserNotificationsByEmail(email);
             notifications.forEach(entry -> {
-                User user = entry.getReceiverUser();
-                UserResponseDTO userDTO = new UserResponseDTO(user);
-                userDTO.setAvatars(getUserActiveAvatar(user));
                 UserNotificationDTO notiDTO = new UserNotificationDTO(entry);
-                notiDTO.setReceiverUser(userDTO);
+                notiDTO.setSourceUser(buildSorceUserResponse(entry.getSourceUserId()));
                 result.add(notiDTO);
             });
         } catch (EmptyCommentException e) {
@@ -67,22 +64,43 @@ public class UserNotificationService {
     }
 
     @TransactionAttribute(TransactionAttributeType.REQUIRED)
+    private UserResponseDTO buildSorceUserResponse(Long userId) {
+        User user;
+        try {
+            user = userDAO.getUserById(userId);
+        } catch (Exception e) {
+            logger.error("CANNOT FIND SOURCE USER IN NOTIFICATION DTO");
+            return new UserResponseDTO();
+        }
+        UserResponseDTO userDTO = new UserResponseDTO(user);
+        userDTO.setAvatars(getUserActiveAvatar(user));
+        return userDTO;
+    }
+
+    @TransactionAttribute(TransactionAttributeType.REQUIRED)
     public void addNotificationForUser(String senderEmail, NotificationType notificationType, Post post)
             throws UserNotFoundException {
         Long postId = post.getPostId();
-        String receiverEmail = post.getOwnerUser().getEmail();
-        User senderUser = userService.getUserByEmail(senderEmail);
-        User receiverUser = userService.getUserByEmail(receiverEmail);
+        User sendUser = userService.getUserByEmail(senderEmail);
+        User receiveUser = getReceiveUser(post);
         Timestamp createdTime = Timestamp.from(Instant.now().truncatedTo(ChronoUnit.SECONDS));
-        String notiMessage = buildNotifiMessage(notificationType, senderUser);
+        String notiMessage = buildNotifiMessage(notificationType, sendUser);
         String referenceLink = buildNotiReperenceLink(postId);
 
-        Notification notification = new Notification(receiverUser, notiMessage, notificationType.name(), createdTime, referenceLink);
+        Notification notification = new Notification(receiveUser, sendUser.getUserId(), notiMessage,
+                notificationType.name(), createdTime,
+                referenceLink);
         try {
             notificationDAO.persistNotfication(notification);
         } catch (Exception ex) {
             logger.error("CANNOT ADD NOTFICATION FOR USER: " + senderEmail);
         }
+    }
+
+    private User getReceiveUser(Post post) throws UserNotFoundException {
+        return Optional.ofNullable(post)
+                .map(Post::getOwnerUser)
+                .orElseThrow(() -> new UserNotFoundException());
     }
 
     private String buildNotiReperenceLink(Long postId) {

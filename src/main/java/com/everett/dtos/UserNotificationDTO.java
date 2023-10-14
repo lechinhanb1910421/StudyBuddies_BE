@@ -8,7 +8,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 public class UserNotificationDTO {
     private Long notiId;
-    private UserResponseDTO receiverUser;
+    private UserResponseDTO sourceUser;
     private String content;
     private String notiType;
     private Timestamp createdAt;
@@ -32,7 +32,6 @@ public class UserNotificationDTO {
     public void setNotiId(Long notiId) {
         this.notiId = notiId;
     }
-
 
     public String getContent() {
         return content;
@@ -67,13 +66,12 @@ public class UserNotificationDTO {
         this.referenceLink = referenceLink;
     }
 
-    public UserResponseDTO getReceiverUser() {
-        return receiverUser;
+    public UserResponseDTO getSourceUser() {
+        return sourceUser;
     }
 
-    public void setReceiverUser(UserResponseDTO receiverUser) {
-        this.receiverUser = receiverUser;
+    public void setSourceUser(UserResponseDTO receiverUser) {
+        this.sourceUser = receiverUser;
     }
-
 
 }
