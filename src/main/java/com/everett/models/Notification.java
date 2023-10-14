@@ -21,8 +21,11 @@ public class Notification {
     private Long notiId;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "receiverId", nullable = false)
+    @JoinColumn(name = "receiveUserId", nullable = false)
     private User receiverUser;
+
+    @Column(name = "sourceUserId")
+    private Long sourceUserId;
 
     @Column(name = "content")
     private String content;
@@ -39,8 +42,10 @@ public class Notification {
     public Notification() {
     }
 
-    public Notification(User receiver, String content, String notiType, Timestamp createdAt, String referenceLink) {
-        this.receiverUser = receiver;
+    public Notification(User receiverUser, Long sourceUserId, String content, String notiType, Timestamp createdAt,
+            String referenceLink) {
+        this.receiverUser = receiverUser;
+        this.sourceUserId = sourceUserId;
         this.content = content;
         this.notiType = notiType;
         this.createdAt = createdAt;
@@ -49,8 +54,9 @@ public class Notification {
 
     @Override
     public String toString() {
-        return "Notification [notiId=" + notiId + ", receiverUser=" + receiverUser + ", content=" + content
-                + ", notiType=" + notiType + ", createdAt=" + createdAt + ", referenceLink=" + referenceLink + "]";
+        return "Notification [notiId=" + notiId + ", receiverUser=" + receiverUser + ", sourceUserId=" + sourceUserId
+                + ", content=" + content + ", notiType=" + notiType + ", createdAt=" + createdAt + ", referenceLink="
+                + referenceLink + "]";
     }
 
     public Long getNotiId() {
@@ -59,6 +65,14 @@ public class Notification {
 
     public void setNotiId(Long notiId) {
         this.notiId = notiId;
+    }
+
+    public Long getSourceUserId() {
+        return sourceUserId;
+    }
+
+    public void setSourceUserId(Long sourceUserId) {
+        this.sourceUserId = sourceUserId;
     }
 
     public User getReceiverUser() {
