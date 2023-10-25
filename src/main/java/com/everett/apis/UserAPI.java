@@ -12,6 +12,7 @@ import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
+import javax.ws.rs.PATCH;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -28,6 +29,8 @@ import org.eclipse.microprofile.jwt.Claim;
 
 import com.everett.dtos.UserResponseDTO;
 import com.everett.exceptions.checkedExceptions.AvatarNotFoundException;
+import com.everett.exceptions.checkedExceptions.NotificationNotFoundException;
+import com.everett.exceptions.checkedExceptions.UserNoPermissionException;
 import com.everett.exceptions.checkedExceptions.UserNotFoundException;
 import com.everett.exceptions.checkedExceptions.UserPersistedException;
 import com.everett.models.Avatar;
@@ -205,6 +208,31 @@ public class UserAPI {
         logger.info("GET NOTIFICATION FOR USER EMAIL: [" + email + "]");
         try {
             return Response.ok(notificationService.getUserNotificationByEmail(email)).build();
+        } catch (UserNotFoundException e) {
+            logger.error("USER WITH EMAIL " + email + " NOT FOUND");
+            Message errMessage = new Message("User with email " + email + " not found");
+            throw new WebApplicationException(Response.status(400).entity(errMessage).build());
+        }
+    }
+
+    @Path("/notifications/{notiId}")
+    @PATCH
+    @Produces(MediaType.APPLICATION_JSON)
+    @RolesAllowed({ "admin", "visitor" })
+    public Response setNotificationState(@PathParam("notiId") Long notiId) {
+        logger.info("SET READ STATUS FOR NOTIFICATION ID: [" + notiId + "]");
+        try {
+            notificationService.setNotifitionReadStateById(notiId, email);
+            return Response.ok().build();
+        } catch (NotificationNotFoundException e) {
+            logger.error("NOTIFICATION WITH ID " + notiId + " NOT FOUND");
+            Message errMessage = new Message("Notification with id " + notiId + " not found");
+            throw new WebApplicationException(Response.status(400).entity(errMessage).build());
+        } catch (UserNoPermissionException e) {
+            logger.error("USER WITH EMAIL " + email + " HAS NOT PERMISSTION TO CHANGE NOTIFICATION ID: " + notiId);
+            Message errMessage = new Message(
+                    "User with email " + email + " has not permisstion to change notification id " + notiId);
+            throw new WebApplicationException(Response.status(400).entity(errMessage).build());
         } catch (UserNotFoundException e) {
             logger.error("USER WITH EMAIL " + email + " NOT FOUND");
             Message errMessage = new Message("User with email " + email + " not found");

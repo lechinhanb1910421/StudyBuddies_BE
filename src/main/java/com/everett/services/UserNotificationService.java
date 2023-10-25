@@ -22,11 +22,14 @@ import com.everett.daos.UserNotificationDAO;
 import com.everett.dtos.UserNotificationDTO;
 import com.everett.dtos.UserResponseDTO;
 import com.everett.exceptions.checkedExceptions.EmptyCommentException;
+import com.everett.exceptions.checkedExceptions.NotificationNotFoundException;
+import com.everett.exceptions.checkedExceptions.UserNoPermissionException;
 import com.everett.exceptions.checkedExceptions.UserNotFoundException;
 import com.everett.models.Avatar;
 import com.everett.models.Notification;
 import com.everett.models.Post;
 import com.everett.models.User;
+import com.everett.models.type.NotificationStateType;
 import com.everett.models.type.NotificationType;
 
 @Stateless
@@ -54,7 +57,7 @@ public class UserNotificationService {
             List<Notification> notifications = notificationDAO.getUserNotificationsByEmail(email);
             notifications.forEach(entry -> {
                 UserNotificationDTO notiDTO = new UserNotificationDTO(entry);
-                notiDTO.setSourceUser(buildSorceUserResponse(entry.getSourceUserId()));
+                notiDTO.setSourceUser(buildSourceUserResponse(entry.getSourceUserId()));
                 result.add(notiDTO);
             });
         } catch (EmptyCommentException e) {
@@ -64,7 +67,7 @@ public class UserNotificationService {
     }
 
     @TransactionAttribute(TransactionAttributeType.REQUIRED)
-    private UserResponseDTO buildSorceUserResponse(Long userId) {
+    private UserResponseDTO buildSourceUserResponse(Long userId) {
         User user;
         try {
             user = userDAO.getUserById(userId);
@@ -89,12 +92,43 @@ public class UserNotificationService {
 
         Notification notification = new Notification(receiveUser, sendUser.getUserId(), notiMessage,
                 notificationType.name(), createdTime,
-                referenceLink);
+                referenceLink, NotificationStateType.UNREAD);
         try {
             notificationDAO.persistNotfication(notification);
         } catch (Exception ex) {
             logger.error("CANNOT ADD NOTFICATION FOR USER: " + senderEmail);
         }
+    }
+
+    @TransactionAttribute(TransactionAttributeType.REQUIRED)
+    public void setNotifitionReadStateById(Long notiId, String ownerEmail)
+            throws NotificationNotFoundException, UserNoPermissionException, UserNotFoundException {
+        try {
+            Notification notification = notificationDAO.getNotificationById(notiId);
+            User notiOwner = userDAO.getUserByEmail(ownerEmail);
+            if (!isUserOwnerOfNotification(notification, notiOwner)) {
+                throw new UserNoPermissionException();
+            }
+            if (notification.getReadStatus() != NotificationStateType.UNREAD) {
+                logger.info(String.format("NOTIFICATION WITH ID: %d HAS STATUS: [%s]. NO CHANGES WAS MADE",
+                        notiId, notification.getReadStatus()));
+                return;
+            }
+            notification.setReadStatus(NotificationStateType.READ);
+            notificationDAO.updateNotification(notification);
+        } catch (NotificationNotFoundException e) {
+            logger.info("STATUS OF NOTIFICATION WITH ID: " + notiId + " WAS NOT CHANGED");
+            throw new NotificationNotFoundException();
+        } catch (UserNotFoundException e) {
+            logger.info("USER WITH EMAIL: " + ownerEmail + " NOT FOUND");
+            throw new UserNotFoundException();
+
+        }
+
+    }
+
+    private boolean isUserOwnerOfNotification(Notification notification, User user) {
+        return notification.getSourceUserId() == user.getUserId();
     }
 
     private User getReceiveUser(Post post) throws UserNotFoundException {
