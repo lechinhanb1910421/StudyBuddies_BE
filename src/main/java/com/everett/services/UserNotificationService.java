@@ -128,7 +128,7 @@ public class UserNotificationService {
     }
 
     private boolean isUserOwnerOfNotification(Notification notification, User user) {
-        return notification.getSourceUserId() == user.getUserId();
+        return notification.getReceiverUser().getUserId() == user.getUserId();
     }
 
     private User getReceiveUser(Post post) throws UserNotFoundException {
