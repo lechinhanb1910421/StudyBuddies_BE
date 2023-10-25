@@ -4,6 +4,8 @@ import java.sql.Timestamp;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -11,6 +13,8 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+
+import com.everett.models.type.NotificationStateType;
 
 @Entity(name = "Notifications")
 @Table(name = "Notifications", schema = "PUBLIC")
@@ -39,17 +43,22 @@ public class Notification {
     @Column(name = "referenceLink", nullable = false)
     private String referenceLink;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "readStatus", nullable = false)
+    private NotificationStateType readStatus;
+
     public Notification() {
     }
 
     public Notification(User receiverUser, Long sourceUserId, String content, String notiType, Timestamp createdAt,
-            String referenceLink) {
+            String referenceLink, NotificationStateType readStatus) {
         this.receiverUser = receiverUser;
         this.sourceUserId = sourceUserId;
         this.content = content;
         this.notiType = notiType;
         this.createdAt = createdAt;
         this.referenceLink = referenceLink;
+        this.readStatus = readStatus;
     }
 
     @Override
@@ -115,4 +124,11 @@ public class Notification {
         this.referenceLink = referenceLink;
     }
 
+    public NotificationStateType getReadStatus() {
+        return readStatus;
+    }
+
+    public void setReadStatus(NotificationStateType readStatus) {
+        this.readStatus = readStatus;
+    }
 }

@@ -1,6 +1,7 @@
 package com.everett.daos;
 
 import java.util.List;
+import java.util.Optional;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -10,6 +11,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.everett.exceptions.checkedExceptions.EmptyCommentException;
+import com.everett.exceptions.checkedExceptions.NotificationNotFoundException;
 import com.everett.models.Notification;
 
 public class UserNotificationDAO {
@@ -39,9 +41,27 @@ public class UserNotificationDAO {
 
     }
 
+    public Notification getNotificationById(Long notiId) throws NotificationNotFoundException {
+        try {
+            return Optional.ofNullable(entityManager.find(Notification.class, notiId))
+                    .orElseThrow(() -> new NotificationNotFoundException(notiId));
+        } catch (Exception ex) {
+            logger.info("CANNOT FIND NOTIFICATION WITH ID: " + notiId);
+            throw new NotificationNotFoundException(notiId);
+        }
+    }
+
     public void persistNotfication(Notification notification) {
         try {
             entityManager.persist(notification);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void updateNotification(Notification notification) {
+        try {
+            entityManager.merge(notification);
         } catch (Exception e) {
             e.printStackTrace();
         }
