@@ -33,7 +33,7 @@ import com.everett.services.PostService;
 
 @Path("/posts")
 @RequestScoped
-@RolesAllowed({ "admin", "visitor" })
+@RolesAllowed({ "ADMIN", "TEACHER", "STUDENT" })
 public class PostAPI {
     private static final Logger logger = LogManager.getLogger(PostAPI.class);
 

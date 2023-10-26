@@ -4,11 +4,13 @@ import java.sql.Timestamp;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.Set;
 
 import javax.annotation.security.DenyAll;
 import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
 import javax.enterprise.context.RequestScoped;
+import javax.enterprise.inject.Instance;
 import javax.inject.Inject;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -36,6 +38,7 @@ import com.everett.exceptions.checkedExceptions.UserPersistedException;
 import com.everett.models.Avatar;
 import com.everett.models.Message;
 import com.everett.models.User;
+import com.everett.models.type.UserRoleType;
 import com.everett.services.PostService;
 import com.everett.services.UserNotificationService;
 import com.everett.services.UserService;
@@ -68,6 +71,10 @@ public class UserAPI {
     private String loginName;
 
     @Inject
+    @Claim("groups")
+    private Instance<Set<String>> roleGroups;
+
+    @Inject
     @ConfigProperty(name = "default_ava_url")
     private String defaultAvaUrl;
 
@@ -94,7 +101,8 @@ public class UserAPI {
     @PermitAll
     public Response addUserFromContext(@QueryParam("avaUrl") String avaUrl) {
         Timestamp createdTime = Timestamp.from(Instant.now().truncatedTo(ChronoUnit.SECONDS));
-        User user = new User(loginName, givenName, familyName, email, createdTime, "active");
+        UserRoleType role = this.getUserRole();
+        User user = new User(loginName, givenName, familyName, email, createdTime, "active", role);
         Avatar avatar = null;
         if (avaUrl == null) {
             avatar = new Avatar(defaultAvaUrl);
@@ -113,9 +121,20 @@ public class UserAPI {
         }
     }
 
+    private UserRoleType getUserRole() {
+        Set<String> roles = roleGroups.iterator().next();
+        if (roles.contains(UserRoleType.ADMIN.name())) {
+            return UserRoleType.ADMIN;
+        } else if (roles.contains(UserRoleType.TEACHER.name())) {
+            return UserRoleType.TEACHER;
+        } else {
+            return UserRoleType.STUDENT;
+        }
+    }
+
     @Path("/")
     @GET
-    @RolesAllowed("admin")
+    @RolesAllowed("ADMIN")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getAllUsers() {
         return Response.ok(userService.getAllUsers()).build();
@@ -203,7 +222,7 @@ public class UserAPI {
     @Path("/notifications")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    @RolesAllowed({ "admin", "visitor" })
+    @RolesAllowed({ "ADMIN", "STUDENT", "TEACHER" })
     public Response getUserNotification() {
         logger.info("GET NOTIFICATION FOR USER EMAIL: [" + email + "]");
         try {
@@ -218,7 +237,7 @@ public class UserAPI {
     @Path("/notifications/{notiId}")
     @PATCH
     @Produces(MediaType.APPLICATION_JSON)
-    @RolesAllowed({ "admin", "visitor" })
+    @RolesAllowed({ "ADMIN", "STUDENT", "TEACHER" })
     public Response setNotificationState(@PathParam("notiId") Long notiId) {
         logger.info("SET READ STATUS FOR NOTIFICATION ID: [" + notiId + "]");
         try {

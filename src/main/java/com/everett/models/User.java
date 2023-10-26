@@ -7,6 +7,8 @@ import java.util.Set;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -15,6 +17,7 @@ import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
+import com.everett.models.type.UserRoleType;
 import com.everett.utils.TimestampDeserializer;
 import com.everett.utils.TimestampSerializer;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -51,6 +54,10 @@ public class User {
     @Column(name = "accountStatus", nullable = false)
     private String accountStatus;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "role", nullable = false)
+    private UserRoleType role;
+
     @OneToMany(mappedBy = "user", targetEntity = Avatar.class, orphanRemoval = true, cascade = CascadeType.ALL)
     private Set<Avatar> avatars = new HashSet<Avatar>();
 
@@ -74,13 +81,14 @@ public class User {
     }
 
     public User(String loginName, String givenName, String familyName, String email, Timestamp createdDate,
-            String accountStatus) {
+            String accountStatus, UserRoleType role) {
         this.loginName = loginName;
         this.givenName = givenName;
         this.familyName = familyName;
         this.email = email;
         this.createdDate = createdDate;
         this.accountStatus = accountStatus;
+        this.role = role;
     }
 
     public Long getUserId() {
@@ -211,4 +219,11 @@ public class User {
         this.notifications = notifications;
     }
 
+    public UserRoleType getRole() {
+        return role;
+    }
+
+    public void setRole(UserRoleType role) {
+        this.role = role;
+    }
 }

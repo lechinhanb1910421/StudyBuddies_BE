@@ -34,6 +34,7 @@ import com.everett.models.Major;
 import com.everett.models.Post;
 import com.everett.models.Topic;
 import com.everett.models.User;
+import com.everett.models.type.UserRoleType;
 import com.everett.services.PostService;
 
 @ExtendWith(MockitoExtension.class)
@@ -60,7 +61,7 @@ public class PostAPITest {
         this.topic = new Topic("Test Topic", "Test Topic Des", 1l);
         this.major = new Major("Test Major", "Test Major Des", 1l);
         Timestamp createdTime = Timestamp.from(Instant.now().truncatedTo(ChronoUnit.SECONDS));
-        this.user = new User("B1910421", "Nhan", "Le", "test@mail.com", createdTime, "active");
+        this.user = new User("B1910421", "Nhan", "Le", "test@mail.com", createdTime, "active", UserRoleType.ADMIN);
         this.post1 = new Post(user, createdTime, "Test Post 1", "public", topic, major);
         this.post2 = new Post(user, createdTime, "Test Post 2", "public", topic, major);
         this.postResponse = new PostResponseDTO(1l, 1L, createdTime, "Test post", "general", "general");
