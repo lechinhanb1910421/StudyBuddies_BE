@@ -1,0 +1,2 @@
+ALTER TABLE PUBLIC.Users 
+ADD COLUMN role varchar(30) DEFAULT 'STUDENT'; 

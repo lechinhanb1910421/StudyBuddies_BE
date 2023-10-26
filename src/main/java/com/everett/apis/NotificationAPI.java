@@ -59,7 +59,7 @@ public class NotificationAPI {
     @Path("/")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    @RolesAllowed("admin")
+    @RolesAllowed("ADMIN")
     public Response getAllDevices() {
         logger.info("GET ALL DEVICES");
         try {
@@ -74,7 +74,7 @@ public class NotificationAPI {
     @Path("/devices/{deviceId}")
     @DELETE
     @Produces(MediaType.APPLICATION_JSON)
-    @RolesAllowed("admin")
+    @RolesAllowed("ADMIN")
     public Response deleteDeviceById(@PathParam("deviceId") Long deviceId) {
         logger.info("DELETE DEVICE WITH ID: " + deviceId);
         try {

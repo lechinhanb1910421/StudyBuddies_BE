@@ -36,7 +36,7 @@ public class AdminAPI {
 
     @Path("/users")
     @GET
-    @RolesAllowed("admin")
+    @RolesAllowed("ADMIN")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getAllUsers() {
         logger.info("GET ALL USER FROM ADMIN");
@@ -45,7 +45,7 @@ public class AdminAPI {
 
     @Path("/users/{userId}/posts/count")
     @GET
-    @RolesAllowed("admin")
+    @RolesAllowed("ADMIN")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getUserPostsCount(@PathParam("userId") Long userId) {
         logger.info("GET NUMBER OF POSTS FROM USER");
@@ -60,7 +60,7 @@ public class AdminAPI {
 
     @Path("/")
     @GET
-    @RolesAllowed("admin")
+    @RolesAllowed("ADMIN")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getBriefStats() {
         logger.info("GET ALL STATS FROM ADMIN");
@@ -69,7 +69,7 @@ public class AdminAPI {
 
     @Path("/posts/{postId}")
     @DELETE
-    @RolesAllowed("admin")
+    @RolesAllowed("ADMIN")
     @Produces(MediaType.APPLICATION_JSON)
     public Response deletePostById(@PathParam("postId") Long postId) {
         try {
