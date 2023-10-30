@@ -86,6 +86,10 @@ public class UserNotificationService {
         Long postId = post.getPostId();
         User sendUser = userService.getUserByEmail(senderEmail);
         User receiveUser = getReceiveUser(post);
+        if (isReceiveUserTheSameFromSender(receiveUser, sendUser)) {
+            logger.info("USER INTERACT WITH THEIR POST, NO NOTIFICATION ADDED");
+            return;
+        }
         Timestamp createdTime = Timestamp.from(Instant.now().truncatedTo(ChronoUnit.SECONDS));
         String notiMessage = buildNotifiMessage(notificationType, sendUser);
         String referenceLink = buildNotiReperenceLink(postId);
@@ -125,6 +129,10 @@ public class UserNotificationService {
 
         }
 
+    }
+
+    private boolean isReceiveUserTheSameFromSender(User receiver, User sendUser) {
+        return receiver.getEmail().equals(sendUser.getEmail());
     }
 
     private boolean isUserOwnerOfNotification(Notification notification, User user) {
