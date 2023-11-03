@@ -7,6 +7,7 @@ import javax.inject.Inject;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
@@ -33,18 +34,23 @@ public class MacBatchAPI {
     @Claim("preferred_username")
     private String triggerUserId;
 
+    @Inject
+    @Claim("email")
+    private String triggerUserEmail;
+
     @Path("/account")
     @POST
     @RolesAllowed("ADMIN")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
+    @Produces(MediaType.TEXT_PLAIN)
     public Response testSubmitThread(@MultipartForm MultipartFormDataInput formInput) {
         try {
-            macService.importUserAccount(formInput, triggerUserId);
+            String stackId = macService.importUserAccount(formInput, triggerUserId, triggerUserEmail);
+            return Response.status(201).entity(stackId).build();
         } catch (BusinessException e) {
             Message errorMessage = new Message(e.getMessage());
             return Response.status(500).entity(errorMessage).build();
         }
-        return Response.status(201).build();
     }
 
 }

@@ -2,6 +2,9 @@ package com.everett.daos;
 
 import java.util.List;
 
+import javax.ejb.Stateless;
+import javax.ejb.TransactionAttribute;
+import javax.ejb.TransactionAttributeType;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
@@ -13,6 +16,7 @@ import org.apache.logging.log4j.Logger;
 import com.everett.exceptions.checkedExceptions.UserNotFoundException;
 import com.everett.models.User;
 
+@Stateless
 public class UserDAO {
     private static final Logger logger = LogManager.getLogger(UserDAO.class);
 
@@ -46,6 +50,7 @@ public class UserDAO {
         return user;
     }
 
+    @TransactionAttribute(TransactionAttributeType.REQUIRED)
     public void persistUser(User user) {
         try {
             entityManager.persist(user);
