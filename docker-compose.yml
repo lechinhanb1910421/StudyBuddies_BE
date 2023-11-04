@@ -42,6 +42,7 @@ services:
       - './:/src'
       - 'server:/opt/jboss/wildfly/standalone/log'
       - './keys:/opt/jboss/wildfly/standalone/configuration/keys'
+      - './src/main/resources/mac_job/export_files:/opt/jboss/wildfly/standalone/mac_job/export_files'
     networks:
       - nlcntt-network
 networks:

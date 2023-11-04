@@ -1,12 +1,16 @@
 package com.everett.apis;
 
+import java.io.IOException;
+
 import javax.annotation.security.DenyAll;
 import javax.annotation.security.RolesAllowed;
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -38,18 +42,35 @@ public class MacBatchAPI {
     @Claim("email")
     private String triggerUserEmail;
 
-    @Path("/account")
     @POST
     @RolesAllowed("ADMIN")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Produces(MediaType.TEXT_PLAIN)
-    public Response testSubmitThread(@MultipartForm MultipartFormDataInput formInput) {
+    public Response createMacJob(@MultipartForm MultipartFormDataInput formInput) {
         try {
+            logger.info("CREATING MAC JOB FOR USER: [" + triggerUserEmail + "]");
             String stackId = macService.importUserAccount(formInput, triggerUserId, triggerUserEmail);
             return Response.status(201).entity(stackId).build();
         } catch (BusinessException e) {
             Message errorMessage = new Message(e.getMessage());
             return Response.status(500).entity(errorMessage).build();
+        }
+    }
+
+    @Path("/{stackId}")
+    @GET
+    @RolesAllowed("ADMIN")
+    @Produces(MediaType.APPLICATION_OCTET_STREAM)
+    public Response getMacJobReportByStackId(@PathParam("stackId") String stackId) {
+        try {
+            logger.info("EXPORTING MAC JOB REPORT FOR STACK ID: [" + stackId + "]");
+            String fileName = macService.buildMacReportName(stackId);
+            return Response.ok(macService.exportMacResultFile(stackId))
+                    .header("Content-Disposition", "attachment; filename=" + fileName).build();
+        } catch (IOException e) {
+            logger.info("AN ERROR OCCURRED WHEN EXPORTING REPORT FOR STACK ID " + stackId);
+            Message mess = new Message("an error occurred when exporting report for stack id " + stackId);
+            return Response.status(500).entity(mess).build();
         }
     }
 

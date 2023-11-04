@@ -1,10 +1,14 @@
 package com.everett.services;
 
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
@@ -16,11 +20,13 @@ import java.util.stream.Collectors;
 import javax.ejb.Stateless;
 import javax.ejb.TransactionAttribute;
 import javax.ejb.TransactionAttributeType;
+import javax.el.StandardELContext;
 import javax.inject.Inject;
 import javax.ws.rs.core.MultivaluedMap;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.jboss.resteasy.plugins.providers.multipart.InputPart;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataInput;
 
@@ -28,6 +34,7 @@ import com.everett.daos.MacInfoDAO;
 import com.everett.daos.MacRecordDAO;
 import com.everett.daos.UserDAO;
 import com.everett.exceptions.checkedExceptions.BusinessException;
+import com.everett.models.Avatar;
 import com.everett.models.MacInfo;
 import com.everett.models.MacRecord;
 import com.everett.models.User;
@@ -38,6 +45,7 @@ import com.opencsv.CSVReader;
 @Stateless
 public class MacService {
     private static final Logger logger = LogManager.getLogger(MacService.class);
+    private static final String MAC_REPORT_FILE_NAME = "MAC_REPORT_%s.csv";
     private static final String STACK_ID_TEMPLATE = "MAC_CREATION_%s_%d";
     private static final int PASSWORD_LENGTH = 10;
     private static final int PASSWORD_CHAR_LOWER_LIMIT = 97;
@@ -52,6 +60,10 @@ public class MacService {
     private static final int CSV_EMAIL_INDEX = 3;
 
     @Inject
+    @ConfigProperty(name = "mac_export_folder")
+    private String macExportFolder;
+
+    @Inject
     MultiThreadService multiThreadService;
 
     @Inject
@@ -62,6 +74,25 @@ public class MacService {
 
     @Inject
     UserDAO userDAO;
+
+    @Inject
+    @ConfigProperty(name = "default_ava_url")
+    private String defaultAvaUrl;
+
+    public String exportMacResultFile(String stackId) throws IOException {
+        // File file = File.createTempFile(buildMacReportName(stackId), ".csv");
+        // try (FileWriter myWriter = new FileWriter(file.getAbsolutePath())) {
+        // myWriter.write("Files in Java might be tricky, but it is fun enough!");
+        // }
+        File file = new File(macExportFolder + "/User_Account_K45.csv");
+        
+        byte[] encoded = Files.readAllBytes(Paths.get(macExportFolder + "/User_Account_K45.csv"));
+        return new String(encoded, "UTF-8");
+    }
+
+    public String buildMacReportName(String stackId) {
+        return String.format(MAC_REPORT_FILE_NAME, stackId);
+    }
 
     @TransactionAttribute(TransactionAttributeType.REQUIRED)
     public String importUserAccount(MultipartFormDataInput formDataInput, String triggerUserId, String triggerUserEmail)
@@ -100,9 +131,12 @@ public class MacService {
                     Thread.sleep(1000);
                 } catch (InterruptedException e) {
                 }
-                User user = new User(nextRecord[CSV_STUDENT_CODE_INDEX], nextRecord[CSV_FAMILY_NAME_INDEX],
-                        nextRecord[CSV_GIVEN_NAME_INDEX], nextRecord[CSV_EMAIL_INDEX], createdTime,
+                User user = new User(nextRecord[CSV_STUDENT_CODE_INDEX], nextRecord[CSV_GIVEN_NAME_INDEX],
+                        nextRecord[CSV_FAMILY_NAME_INDEX], nextRecord[CSV_EMAIL_INDEX], createdTime,
                         DEFAULT_ACCOUNT_STATUS, DEFAULT_USER_ROLE);
+                Avatar avatar = new Avatar(defaultAvaUrl);
+                user.setAvatar(avatar);
+                // call Keycloak admin client to add user to keycloak
                 userDAO.persistUser(user);
                 saveSuccesMacRecord(createdTime, nextRecord[CSV_EMAIL_INDEX], stackId);
             }
