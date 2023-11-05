@@ -1,8 +1,6 @@
 package com.everett.services;
 
 import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -20,7 +18,6 @@ import java.util.stream.Collectors;
 import javax.ejb.Stateless;
 import javax.ejb.TransactionAttribute;
 import javax.ejb.TransactionAttributeType;
-import javax.el.StandardELContext;
 import javax.inject.Inject;
 import javax.ws.rs.core.MultivaluedMap;
 
@@ -52,8 +49,9 @@ public class MacService {
     private static final int PASSWORD_CHAR_UPPER_LIMIT = 122;
     private static final String DEFAULT_ACCOUNT_STATUS = "active";
     private static final UserRoleType DEFAULT_USER_ROLE = UserRoleType.STUDENT;
-    private static final String STATUS_MESSAGE_SUCCESS = "[SUCCESS] USER WITH EMAIL: [%s] WAS SUCCESSFULLY ADDED";
-    private static final String STATUS_MESSAGE_FAIL = "[FAIL] FAILED TO PERSIST RECORD [%s] TO DATABASE";
+    private static final String STATUS_MESSAGE_SUCCESS = "USER WITH EMAIL: [%s] WAS SUCCESSFULLY ADDED";
+    private static final String STATUS_MESSAGE_FAIL_DB = "FAILED TO PERSIST RECORD [%s] TO DATABASE";
+    private static final String STATUS_MESSAGE_FAIL_KEYCLOAK = "FAILED TO CREATE USER IN KEYCLOAK";
     private static final int CSV_STUDENT_CODE_INDEX = 0;
     private static final int CSV_FAMILY_NAME_INDEX = 1;
     private static final int CSV_GIVEN_NAME_INDEX = 2;
@@ -76,6 +74,9 @@ public class MacService {
     UserDAO userDAO;
 
     @Inject
+    private KeycloakAdminService kcAdminService;
+
+    @Inject
     @ConfigProperty(name = "default_ava_url")
     private String defaultAvaUrl;
 
@@ -84,8 +85,8 @@ public class MacService {
         // try (FileWriter myWriter = new FileWriter(file.getAbsolutePath())) {
         // myWriter.write("Files in Java might be tricky, but it is fun enough!");
         // }
-        File file = new File(macExportFolder + "/User_Account_K45.csv");
-        
+        // File file = new File(macExportFolder + "/User_Account_K45.csv");
+
         byte[] encoded = Files.readAllBytes(Paths.get(macExportFolder + "/User_Account_K45.csv"));
         return new String(encoded, "UTF-8");
     }
@@ -111,11 +112,11 @@ public class MacService {
                     // remove first line
                     nextRecord = csvReader.readNext();
                     while ((nextRecord = csvReader.readNext()) != null) {
-                        multiThreadService.submitTask(createMacTask(nextRecord, createdTime, stackId));
                     }
+                    multiThreadService.submitTask(createMacTask(nextRecord, createdTime, stackId));
                 } catch (Exception ex) {
                     logger.info("FAILED TO PERSIST USER TO DATABASE");
-                    saveFailMacRecord(createdTime, stackId, nextRecord);
+                    saveFailMacRecord(MacRecordStatus.FAIL_DB, createdTime, stackId, nextRecord);
                 }
             }
         } catch (IOException ioEx) {
@@ -127,47 +128,64 @@ public class MacService {
     private Runnable createMacTask(String[] nextRecord, Timestamp createdTime, String stackId) {
         return new Runnable() {
             public void run() {
-                try {
-                    Thread.sleep(1000);
-                } catch (InterruptedException e) {
-                }
                 User user = new User(nextRecord[CSV_STUDENT_CODE_INDEX], nextRecord[CSV_GIVEN_NAME_INDEX],
                         nextRecord[CSV_FAMILY_NAME_INDEX], nextRecord[CSV_EMAIL_INDEX], createdTime,
                         DEFAULT_ACCOUNT_STATUS, DEFAULT_USER_ROLE);
                 Avatar avatar = new Avatar(defaultAvaUrl);
                 user.setAvatar(avatar);
-                // call Keycloak admin client to add user to keycloak
                 userDAO.persistUser(user);
-                saveSuccesMacRecord(createdTime, nextRecord[CSV_EMAIL_INDEX], stackId);
+                // call Keycloak admin client to add user to keycloak
+                String userTempPass = generateRandomTempPassword();
+                try {
+                    kcAdminService.createKeycloakUser(user, userTempPass);
+                } catch (Exception ex) {
+                    saveFailMacRecord(MacRecordStatus.FAIL_KEYCLOAK, createdTime, stackId, null);
+                    logger.info("FAIL TO CREATE USER IN KEYCLOAK");
+                }
+                saveSuccesMacRecord(createdTime, nextRecord[CSV_EMAIL_INDEX], stackId, userTempPass);
             }
         };
     }
 
-    private void saveSuccesMacRecord(Timestamp createdAt, String userEmail, String stackId) {
+    private void saveSuccesMacRecord(Timestamp createdAt, String userEmail, String stackId, String tempPass) {
         MacRecord macRecord = MacRecord.builder()
                 .createdAt(createdAt)
                 .status(MacRecordStatus.SUCCESS)
                 .statusMessage(String.format(STATUS_MESSAGE_SUCCESS, userEmail))
                 .stackId(stackId)
                 .userEmail(userEmail)
-                .userTempPass(generateRandomTempPassword())
+                .userTempPass(tempPass)
                 .build();
 
         macRecordDAO.persistMacRecord(macRecord);
         logger.info("USER WITH EMAIL: [" + userEmail + "] WAS SUCCESSFULLY ADDED");
     }
 
-    private void saveFailMacRecord(Timestamp createdAt, String stackId, String[] record) {
-        MacRecord macRecord = MacRecord.builder()
-                .createdAt(createdAt)
-                .status(MacRecordStatus.FAIL)
-                .statusMessage(String.format(STATUS_MESSAGE_FAIL, record.toString()))
-                .stackId(stackId)
-                .userEmail("UNKNOWN")
-                .userTempPass(generateRandomTempPassword())
-                .build();
+    private void saveFailMacRecord(MacRecordStatus macRecordStatus, Timestamp createdAt, String stackId,
+            String[] record) {
+        if (MacRecordStatus.FAIL_DB.equals(macRecordStatus)) {
+            MacRecord macRecord = MacRecord.builder()
+                    .createdAt(createdAt)
+                    .status(MacRecordStatus.FAIL_DB)
+                    .statusMessage(String.format(STATUS_MESSAGE_FAIL_DB, record.toString()))
+                    .stackId(stackId)
+                    .userEmail("UNKNOWN")
+                    .userTempPass("")
+                    .build();
 
-        macRecordDAO.persistMacRecord(macRecord);
+            macRecordDAO.persistMacRecord(macRecord);
+        } else if (MacRecordStatus.FAIL_KEYCLOAK.equals(macRecordStatus)) {
+            MacRecord macRecord = MacRecord.builder()
+                    .createdAt(createdAt)
+                    .status(MacRecordStatus.FAIL_KEYCLOAK)
+                    .statusMessage(STATUS_MESSAGE_FAIL_KEYCLOAK)
+                    .stackId(stackId)
+                    .userEmail("UNKNOWN")
+                    .userTempPass("")
+                    .build();
+
+            macRecordDAO.persistMacRecord(macRecord);
+        }
         logger.info("FAILED TO ADD RECORD [" + record.toString() + "] TO DATABASE");
     }
 
