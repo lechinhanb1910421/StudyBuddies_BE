@@ -1,6 +1,8 @@
 package com.everett.services;
 
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -49,17 +51,23 @@ public class MacService {
     private static final int PASSWORD_CHAR_UPPER_LIMIT = 122;
     private static final String DEFAULT_ACCOUNT_STATUS = "active";
     private static final UserRoleType DEFAULT_USER_ROLE = UserRoleType.STUDENT;
-    private static final String STATUS_MESSAGE_SUCCESS = "USER WITH EMAIL: [%s] WAS SUCCESSFULLY ADDED";
-    private static final String STATUS_MESSAGE_FAIL_DB = "FAILED TO PERSIST RECORD [%s] TO DATABASE";
-    private static final String STATUS_MESSAGE_FAIL_KEYCLOAK = "FAILED TO CREATE USER IN KEYCLOAK";
+    private static final String STATUS_MESSAGE_SUCCESS = "User with email: [%s] was successfully added";
+    private static final String STATUS_MESSAGE_FAIL_DB = "Fail to persist record [%s] to database";
+    private static final String STATUS_MESSAGE_FAIL_KEYCLOAK = "Fail to create user in keycloak";
     private static final int CSV_STUDENT_CODE_INDEX = 0;
     private static final int CSV_FAMILY_NAME_INDEX = 1;
     private static final int CSV_GIVEN_NAME_INDEX = 2;
     private static final int CSV_EMAIL_INDEX = 3;
+    private static final String CSV_REPORT_HEADER = "Email,Temp password,Status,Message\n";
+    private static final String CSV_REPORT_ROW_TEMPLATE = "%s,%s,%s,%s\n";
 
     @Inject
     @ConfigProperty(name = "mac_export_folder")
     private String macExportFolder;
+
+    @Inject
+    @ConfigProperty(name = "default_ava_url")
+    private String defaultAvaUrl;
 
     @Inject
     MultiThreadService multiThreadService;
@@ -76,18 +84,18 @@ public class MacService {
     @Inject
     private KeycloakAdminService kcAdminService;
 
-    @Inject
-    @ConfigProperty(name = "default_ava_url")
-    private String defaultAvaUrl;
-
     public String exportMacResultFile(String stackId) throws IOException {
-        // File file = File.createTempFile(buildMacReportName(stackId), ".csv");
-        // try (FileWriter myWriter = new FileWriter(file.getAbsolutePath())) {
-        // myWriter.write("Files in Java might be tricky, but it is fun enough!");
-        // }
-        // File file = new File(macExportFolder + "/User_Account_K45.csv");
-
-        byte[] encoded = Files.readAllBytes(Paths.get(macExportFolder + "/User_Account_K45.csv"));
+        List<MacRecord> records = macRecordDAO.getRecordsByStackId(stackId);
+        String reportFileName = buildMacReportName(stackId);
+        File file = new File(macExportFolder + "/" + reportFileName);
+        try (FileWriter myWriter = new FileWriter(file.getAbsolutePath())) {
+            myWriter.write(CSV_REPORT_HEADER);
+            for (MacRecord record : records) {
+                myWriter.write(String.format(CSV_REPORT_ROW_TEMPLATE, record.getUserEmail(), record.getUserTempPass(),
+                        record.getStatus(), record.getStatusMessage()));
+            }
+        }
+        byte[] encoded = Files.readAllBytes(Paths.get(macExportFolder + "/" + reportFileName));
         return new String(encoded, "UTF-8");
     }
 
@@ -111,9 +119,10 @@ public class MacService {
                 try {
                     // remove first line
                     nextRecord = csvReader.readNext();
+                    System.out.println("READ RECORD");
                     while ((nextRecord = csvReader.readNext()) != null) {
+                        multiThreadService.submitTask(createMacTask(nextRecord, createdTime, stackId));
                     }
-                    multiThreadService.submitTask(createMacTask(nextRecord, createdTime, stackId));
                 } catch (Exception ex) {
                     logger.info("FAILED TO PERSIST USER TO DATABASE");
                     saveFailMacRecord(MacRecordStatus.FAIL_DB, createdTime, stackId, nextRecord);
