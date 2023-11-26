@@ -5,3 +5,4 @@ build_and_deploy.bat
 .env
 keys/firebaseAccountKey.json
 quick_deploy.bat
+src/main/resources/mac_job/export_files/
