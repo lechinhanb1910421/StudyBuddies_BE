@@ -60,7 +60,7 @@ public class MacBatchAPI {
     @Path("/{stackId}")
     @GET
     @RolesAllowed("ADMIN")
-    @Produces(MediaType.APPLICATION_OCTET_STREAM)
+    @Produces({ MediaType.APPLICATION_OCTET_STREAM, MediaType.APPLICATION_JSON })
     public Response getMacJobReportByStackId(@PathParam("stackId") String stackId) {
         try {
             logger.info("EXPORTING MAC JOB REPORT FOR STACK ID: [" + stackId + "]");
@@ -69,8 +69,12 @@ public class MacBatchAPI {
                     .header("Content-Disposition", "attachment; filename=" + fileName).build();
         } catch (IOException e) {
             logger.info("AN ERROR OCCURRED WHEN EXPORTING REPORT FOR STACK ID " + stackId);
-            Message mess = new Message("an error occurred when exporting report for stack id " + stackId);
-            return Response.status(500).entity(mess).build();
+            Message mess = new Message("An error occurred when exporting report for stack id " + stackId);
+            return Response.status(500).type(MediaType.APPLICATION_JSON).entity(mess).build();
+        } catch (BusinessException e) {
+            logger.info("CANNOT FIND STACK ID " + stackId);
+            Message mess = new Message("Cannot find stack id " + stackId);
+            return Response.status(404).type(MediaType.APPLICATION_JSON).entity(mess).build();
         }
     }
 

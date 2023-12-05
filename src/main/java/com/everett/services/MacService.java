@@ -88,8 +88,11 @@ public class MacService {
     @Inject
     private KeycloakAdminService kcAdminService;
 
-    public String exportMacResultFile(String stackId) throws IOException {
+    public String exportMacResultFile(String stackId) throws IOException, BusinessException {
         List<MacRecord> records = macRecordDAO.getRecordsByStackId(stackId);
+        if (records.size() == 0) {
+            throw new BusinessException("Cannot find stackID:" + stackId);
+        }
         String reportFileName = buildMacReportName(stackId);
         File file = new File(macExportFolder + "/" + reportFileName);
         if (file.length() == 0) {
@@ -129,11 +132,13 @@ public class MacService {
                     // remove first line
                     nextRecord = csvReader.readNext();
                     while ((nextRecord = csvReader.readNext()) != null) {
-                        multiThreadService.submitTask(createMacTask(nextRecord, createdTime, stackId));
+                        multiThreadService.submitTask(createMacTask(nextRecord, createdTime,
+                                stackId));
                     }
                 } catch (CsvValidationException | IOException ex) {
                     logger.info("FAILED TO READ RECORD CSV ROW");
-                    saveFailMacRecord(MacRecordStatus.FAIL_READING_CSV_ROW, createdTime, stackId, nextRecord, null);
+                    saveFailMacRecord(MacRecordStatus.FAIL_READING_CSV_ROW, createdTime, stackId,
+                            nextRecord, null);
                 }
             }
         } catch (IOException ioEx) {
